@@ -1,0 +1,27 @@
+# LibriSpeech train-clean-100 完整数据配置
+# 用于 Phase 2: Standard KD Complete Version
+
+data:
+  dataset_name: "librispeech_asr"
+  dataset_config: "clean"
+  split: "train.100"
+  
+  # 使用全部数据
+  num_samples: null
+  
+  # 时长限制（保持与 Phase 1 一致）
+  max_duration: 10.0  # 秒
+  
+  # 采样率
+  sample_rate: 16000
+  
+  # 数据划分比例
+  train_ratio: 0.9   # 90% 训练
+  val_ratio: 0.05    # 5% 验证
+  test_ratio: 0.05   # 5% 测试
+  
+  # DataLoader 配置
+  batch_size: 16      # 增大 batch size（Phase 1 是 8）
+  num_workers: 8      # 增加并行加载
+  pin_memory: true
+

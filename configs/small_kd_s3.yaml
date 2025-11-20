@@ -1,0 +1,40 @@
+# Phase 2: KD with whisper-small teacher and S3 student
+# S3 = 3-layer student decoder (性能/速度平衡)
+
+model:
+  teacher_model: "openai/whisper-small"
+  student_decoder_layers: 3
+  student_decoder_heads: 12
+  student_hidden_size: 768
+  dropout: 0.1
+
+data:
+  dataset_name: "librispeech_asr"
+  dataset_config: "clean"
+  split: "train.100"
+  num_samples: null
+  max_duration: 10.0
+  batch_size: 16
+  num_workers: 8
+  sample_rate: 16000
+  train_ratio: 0.9
+  val_ratio: 0.05
+  test_ratio: 0.05
+
+training:
+  epochs: 15
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_steps: 500
+  gradient_clip: 1.0
+  log_interval: 100
+  eval_interval: 1000
+  save_interval: 2000
+  output_dir: "./outputs/small_kd_s3"
+  seed: 42
+  fp16: true
+
+kd:
+  temperature: 4.0
+  alpha: 0.5
+

@@ -1,0 +1,15 @@
+# Whisper-Small Teacher 配置
+# 用于 Phase 2: Standard KD Complete Version
+
+model:
+  teacher_model: "openai/whisper-small"
+  
+  # Model specifications:
+  # - Total params: 244M
+  # - Encoder params: ~167M (12 layers, hidden 768)
+  # - Decoder params: ~77M (12 layers, hidden 768)
+  # - Vocab size: 51865
+  # - Hidden size: 768
+  # - Encoder layers: 12
+  # - Decoder layers: 12
+

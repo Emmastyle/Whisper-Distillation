@@ -2,12 +2,12 @@
 
 ## 总体概览
 
-本项目分为两个主要阶段，从小规模验证到大规模 DKD 实验。
+本项目遵循 “Mini 验证 → 标准 KD 扩展 → DKD 创新” 的三步推进。
 
 ```
-Phase 1 (已完成) → Phase 2 (待实施) → Final Report & Presentation
-    ↓                    ↓                           ↓
- 基线验证            DKD 核心实现              论文级成果
+Phase 1 (已完成) → Phase 2 (标准 KD 扩展) → Phase 3 (DKD 研究) → Final Report
+    ↓                    ↓                        ↓
+ 基线验证            Classical KD 完整版       DKD 创新实验
 ```
 
 ---
@@ -67,109 +67,97 @@ Phase 1 (已完成) → Phase 2 (待实施) → Final Report & Presentation
 
 ---
 
-## Phase 2: DKD 核心实现 🚧 (待实施)
+## Phase 2: 标准 KD 扩展 🚧 (进行中)
 
 ### 目标
-扩展到大规模，实现 DKD，进行完整的 ablation study
+在 Phase 1 的基础上放大规模，完成 Classical KD 的完整实验，输出课程所需的全部指标：
+
+1. Teacher：tiny → small/base（更高质量的 logits）
+2. 数据：1000 samples → 50–100 小时（train-clean-100）
+3. Student：S2 / S3 / S4（2/3/4 层 decoder）
+4. 训练：CE-only vs KD & 温度 T 最优
+5. 指标：参数量、FLOPs、RTF、WER/CER + 速度–准确率曲线
 
 ### 实施计划
 
-#### 2.1 扩展基础 (Week 4)
+#### 2.1 基础扩展 (Week 4)
 
 **数据扩展**:
-- [ ] 使用完整 LibriSpeech train-clean-100 (100h)
-- [ ] 优化数据加载效率
-- [ ] 数据统计和分析
+- [ ] 使用 LibriSpeech train-clean-100 (≈100h)
+- [ ] 数据划分：train/val/test = 90/5/5
+- [ ] 数据统计与质量分析
 
 **Teacher 升级**:
-- [ ] whisper-tiny (39M) → whisper-small (244M)
-- [ ] 测试 teacher 性能 (WER 上限)
-- [ ] 显存和速度优化
+- [ ] whisper-tiny → whisper-small（必要时尝试 whisper-base）
+- [ ] 记录 teacher WER/CER、RTF、显存占用
 
-**多种 Student**:
-- [ ] S2: 2层 decoder (~1.5M params)
-- [ ] S3: 3层 decoder (~2.3M params)
-- [ ] S4: 4层 decoder (~3.1M params)
+**Student 变体**:
+- [ ] S2: 2-layer decoder（轻量、速度快）
+- [ ] S3: 3-layer decoder（性能/速度平衡）
+- [ ] S4: 4-layer decoder（追求最佳性能）
 
 **交付物**:
-- 大规模配置文件
-- Teacher 性能测试报告
-- Student 对比配置
+- `configs/data_100h.yaml`
+- `configs/teacher_small.yaml`
+- S2/S3/S4 训练配置
+- Teacher 对比报告
 
-#### 2.2 Classical KD 扩展 (Week 4)
+#### 2.2 Classical KD 训练 (Week 4-5)
+
+**实验矩阵**:
+| Teacher | Student | Loss | 目的 |
+|---------|---------|------|------|
+| small | S2 | CE-only | baseline |
+| small | S2 | KD | 对比 CE vs KD |
+| small | S3 | KD | 性能/速度平衡 |
+| small | S4 | KD | 追求最佳准确率 |
 
 **任务**:
-- [ ] 在 S2/S3/S4 上分别训练 classical KD
-- [ ] 收集 WER/CER、参数量、RTF
-- [ ] 绘制 speed-accuracy 曲线
+- [ ] 训练 CE-only baseline (S2)
+- [ ] 训练 KD (S2/S3/S4)
+- [ ] 保存最佳模型、记录训练日志
 
 **交付物**:
-- 批量训练脚本
-- 性能评估脚本
-- Student 对比报告
+- 批量训练脚本 (`scripts/train_phase2_all.sh`)
+- `outputs/*/train.log`、`best_model.pt`
+- 初步 WER/CER 统计
 
-#### 2.3 DKD 实现 (Week 5)
+#### 2.3 温度实验 (Week 5)
 
-**核心任务**:
-- [ ] 实现 TCKD Loss
-- [ ] 实现 NCKD Loss
-- [ ] 实现 DKD 训练脚本
-- [ ] 配置超参数 (α, β, T)
-
-**Ablation Study** (5个实验):
-1. [ ] CE-only
-2. [ ] CE + Classical KD
-3. [ ] CE + TCKD only
-4. [ ] CE + NCKD only
-5. [ ] CE + DKD (TCKD + NCKD)
-
-**交付物**:
-- DKD Loss 实现
-- DKD 训练脚本
-- Ablation 配置文件 (5个)
-- Ablation 结果报告
-
-#### 2.4 温度实验 (Week 5)
+**设置**:
+- Teacher = whisper-small，Student = S3
+- T ∈ {1, 2, 4, 6, 8}
 
 **任务**:
-- [ ] 在 T={1,2,4,8,16} 上测试 classical KD
-- [ ] 在 T={1,2,4,8,16} 上测试 DKD
-- [ ] 分析温度对性能的影响
-- [ ] 找到最优温度
+- [ ] 运行 5 组温度实验
+- [ ] 分析温度对 WER/CER、收敛速度的影响
+- [ ] 选择最优温度 T*
 
 **交付物**:
-- 温度扫描配置 (10个)
-- 温度分析脚本
-- 温度实验报告
+- `configs/temperature/*.yaml`
+- 温度分析脚本 (`scripts/analyze_temperature.py`)
+- `results/temperature_analysis.{png,pdf}`
 
-#### 2.5 评估与可视化 (Week 6)
+#### 2.4 评估与可视化 (Week 6)
 
 **任务**:
-- [ ] 统一评估框架
-- [ ] 性能分析 (FLOPs, RTF)
-- [ ] 生成所有图表
-- [ ] 生成所有表格
-- [ ] 汇总实验结果
-
-**图表**:
-1. Speed-Accuracy Curve (WER vs params, WER vs RTF)
-2. Ablation Comparison (柱状图)
-3. Temperature Analysis (T vs WER)
-4. Training Curves (loss, WER 随 epoch)
-5. Loss Decomposition (CE/TCKD/NCKD)
+- [ ] 统一评估所有模型（测试集 WER/CER）
+- [ ] 统计参数量、FLOPs、RTF
+- [ ] 绘制 Speed-Accuracy Curve、CE vs KD 对比
+- [ ] 汇总表格（CSV + LaTeX）
+- [ ] 生成 Phase 2 结果报告
 
 **交付物**:
-- 评估框架代码
-- 所有图表 (PDF/PNG)
-- 所有表格 (LaTeX/Markdown)
-- 最终结果报告
+- `results/model_comparison.{csv,tex}`
+- `results/speed_accuracy_curve.{png,pdf}`
+- `doc/phase2_results.md`
 
-#### 2.6 (可选) 大规模实验 (Week 6-7)
+#### 2.5 (可选) 规模再扩展
 
-如果时间允许:
-- [ ] whisper-base teacher
-- [ ] train-clean-360 (360h)
-- [ ] 验证 scaling 效果
+若时间/算力允许，可额外尝试：
+- Teacher = whisper-base
+- 数据 = train-clean-360 子集
+- 仅跑 CE vs KD，验证 scaling 趋势
 
 ---
 
@@ -182,33 +170,33 @@ Week 1-2 (已完成): Phase 1 基础设施
 ├── CE/KD baseline
 └── 文档
 
-Week 3 (已完成): Phase 1 完善
-├── 测试验证
-├── 文档完善
-└── Phase 2 计划
+Week 3 (已完成): Phase 1 收尾
+├── 运行 test_setup
+├── 完成 Phase 1 文档
+└── 规划 Phase 2
 
 Week 4: Phase 2 扩展
-├── 数据扩展 (100h)
-├── Teacher 升级 (small)
-├── S2/S3/S4 实现
-└── Classical KD 训练
+├── 数据扩展到 100h
+├── Teacher 升级为 small
+├── S2/S3/S4 配置与测试
+└── 启动 CE/KD 训练
 
-Week 5: Phase 2 核心
-├── DKD 实现
-├── Ablation Study (5个实验)
-├── 温度实验
-└── 结果初步分析
+Week 5: Phase 2 深入
+├── 完成所有 CE/KD 训练
+├── 温度实验 (T=1/2/4/6/8)
+├── 收集初步指标
+└── 准备中期展示
 
-Week 6: Phase 2 完善
-├── 完整评估
-├── 可视化
-├── 结果汇总
-└── 报告撰写
+Week 6: Phase 2 完成
+├── 统一评估 + Speed-Accuracy 曲线
+├── 生成对比表格/图
+├── 撰写 Phase 2 报告
+└── 准备 poster / slides
 
-Week 7 (可选): 扩展实验
-├── 更大规模
-├── 更多对比
-└── 论文润色
+Week 7+: Phase 3 (DKD 研究)
+├── Loss 设计 (TCKD/NCKD)
+├── Ablation Study
+└── CE/KD/DKD 对比
 ```
 
 ---
@@ -240,15 +228,15 @@ Week 7 (可选): 扩展实验
 
 ## 课程要求对照表
 
-| 课程要求 | 实现方式 | 状态 | 文件位置 |
-|----------|---------|------|---------|
-| Student 使用 soft labels | DKD (TCKD+NCKD) | 🚧 Phase 2 | `src/training/losses.py` |
-| 不同温度 T 的影响 | T={1,2,4,8,16} 扫描 | 🚧 Phase 2 | `doc/temperature_analysis.md` |
-| 不同架构对比 | S2/S3/S4 对比 | 🚧 Phase 2 | `doc/student_comparison.md` |
-| KD vs No-KD 对比 | Ablation study | 🚧 Phase 2 | `doc/dkd_ablation_results.md` |
-| 完整实验报告 | 最终报告 + figures | 🚧 Phase 2 | `doc/final_report.md` |
-| 代码实现 | 完整 codebase | ✅ Phase 1 | `src/*` |
-| Baseline 训练 | CE + classical KD | ✅ Phase 1 | `src/training/train_{ce,kd}.py` |
+| 课程要求 | Phase 2 对应 | 状态 | 文件位置 |
+|----------|-------------|------|---------|
+| Student 使用 soft labels | Classical KD（S2/S3/S4） | 🚧 进行中 | `src/training/train_kd.py` |
+| 不同温度 T 的影响 | T={1,2,4,6,8} 扫描 | ⏳ 即将开始 | `doc/temperature_analysis.md` (计划) |
+| 不同架构对比 | S2 vs S3 vs S4 | 🚧 进行中 | `doc/student_comparison.md` (计划) |
+| KD vs No-KD 对比 | CE-only vs KD (S2) | 🚧 进行中 | `doc/phase2_results.md` (计划) |
+| 完整实验报告 | Phase 2 结果 + poster | ⏳ Week 6 | `doc/phase2_results.md` / `doc/final_report.md` |
+| 代码实现 | Phase 1 基础设施 | ✅ 完成 | `src/*` |
+| Baseline 训练 | CE + classical KD (tiny) | ✅ 完成 | `src/training/train_{ce,kd}.py` |
 
 ---
 
@@ -256,29 +244,27 @@ Week 7 (可选): 扩展实验
 
 ### 定量指标
 
-**模型对比**:
+**模型对比（Phase 2 预计）**:
 | 模型 | Params | WER | RTF | 说明 |
 |------|--------|-----|-----|------|
 | Teacher (small) | 244M | ~5% | 0.2 | 上限参考 |
 | Student S2 (CE) | 1.5M | ~12% | 0.05 | Baseline |
-| Student S2 (KD) | 1.5M | ~10% | 0.05 | Classical KD |
-| Student S3 (KD) | 2.3M | ~8% | 0.08 | 平衡点 |
-| Student S3 (DKD) | 2.3M | ~7.5% | 0.08 | **Best** |
-| Student S4 (DKD) | 3.1M | ~7% | 0.10 | 更强性能 |
+| Student S2 (KD) | 1.5M | ~10% | 0.05 | KD 带来 +2% |
+| Student S3 (KD) | 2.3M | ~8% | 0.08 | 性能/速度平衡 |
+| Student S4 (KD) | 3.1M | ~7.3% | 0.11 | 精度优先 |
 
-**Ablation 预期**:
-| 方法 | WER | 相对提升 |
-|------|-----|---------|
-| CE-only | 12.0% | Baseline |
-| CE+KD | 10.0% | +2.0% |
-| CE+TCKD | 11.0% | +1.0% |
-| CE+NCKD | 9.5% | +2.5% |
-| CE+DKD | 9.0% | +3.0% |
+**CE vs KD 对比（S2 示例）**:
+| Loss | 预期 WER | CER | 备注 |
+|------|---------|-----|------|
+| CE-only | 12.0% | 6.0% | Hard labels |
+| CE + KD (T=4) | 10.0% | 5.2% | Soft labels, 与课程要求一一对应 |
 
 **温度分析预期**:
 - T=1: 接近 hard labels
 - T=2-4: 最优区间
 - T=8-16: 过度平滑
+
+> Phase 3（DKD）计划在 Phase 2 完成后启动，目标是在上述 KD 结果基础上再降低 0.5–1.0% WER。
 
 ### 定性成果
 
@@ -295,9 +281,9 @@ Week 7 (可选): 扩展实验
 - ✅ 可视化丰富
 
 **创新点**:
-- ✅ DKD 在 ASR 上的应用
-- ✅ Decoder-only distillation
-- ✅ 系统的实验设计
+- ✅ Decoder-only distillation（冻结 encoder + 轻量 decoder）
+- ✅ 速度–准确率权衡分析
+- ✅ Phase 3 计划引入 DKD（TCKD/NCKD）作为额外创新
 
 ---
 
@@ -312,14 +298,14 @@ Week 7 (可选): 扩展实验
 2. 使用梯度累积减少显存占用
 3. 减少数据量但保证实验完整性
 
-### 风险 2: DKD 效果不明显
+### 风险 2: 温度/超参选择不佳
 
-**影响**: 与 classical KD 差异小
+**影响**: KD 改善不足或训练不稳定
 
 **应对**:
-1. 调整超参数 (α, β, T)
-2. 尝试不同数据规模
-3. 深入分析 TCKD vs NCKD 的作用
+1. 进行系统的 T 扫描（1/2/4/6/8）
+2. 结合验证集 WER + loss 曲线共同判断
+3. 适当调整 α（CE/KD 权重）与 batch size
 
 ### 风险 3: 时间不够
 
@@ -349,25 +335,25 @@ Week 7 (可选): 扩展实验
 - 标志: 三种 student 都训练完成
 - 交付: Student 对比报告
 
-### Milestone 4: DKD 实现完成
-- 日期: Week 5 Day 2
-- 标志: DKD Loss 实现并通过测试
-- 交付: DKD 实现代码
-
-### Milestone 5: Ablation 完成
+### Milestone 4: 温度实验完成
 - 日期: Week 5 Day 5
-- 标志: 5个 ablation 实验完成
-- 交付: Ablation 结果报告
+- 标志: T=1/2/4/6/8 实验全部结束
+- 交付: Temperature 分析图/表
 
-### Milestone 6: 温度实验完成
-- 日期: Week 5 Day 7
-- 标志: 温度扫描实验完成
-- 交付: 温度分析报告
+### Milestone 5: Speed-Accuracy 曲线完成
+- 日期: Week 6 Day 3
+- 标志: S2/S3/S4 的 WER、RTF、FLOPs 全部统计
+- 交付: `results/model_comparison.*`、`speed_accuracy_curve.*`
 
-### Milestone 7: Phase 2 完成
+### Milestone 6: Phase 2 报告提交
 - 日期: Week 6 Day 7
-- 标志: 所有图表和报告生成
-- 交付: 完整项目报告
+- 标志: Phase 2 结果、图表、poster 草稿齐备
+- 交付: `doc/phase2_results.md`、slides/poster 草稿
+
+### Milestone 7: Phase 3 启动（可选）
+- 日期: Week 7+
+- 标志: DKD 设计评审通过
+- 交付: Phase 3 计划（DKD loss、实验矩阵）
 
 ---
 
@@ -380,10 +366,10 @@ Week 7 (可选): 扩展实验
 
 ### 时间估算
 - **数据准备**: 2-3 小时
-- **S2/S3/S4 训练**: 每个 6-8 小时
-- **Ablation (5个)**: 30-40 小时
-- **温度实验 (10个)**: 60-80 小时
-- **总计**: ~150-200 GPU 小时
+- **S2/S3/S4 训练 (CE/KD)**: 每个 6-8 小时（共 ~24 小时）
+- **温度实验 (5 组)**: 30-40 小时
+- **评估 & 可视化**: 10-15 小时
+- **总计**: ~80-100 GPU 小时
 
 ### 人力投入
 - **编码**: 40-60 小时
@@ -397,27 +383,25 @@ Week 7 (可选): 扩展实验
 ## 下一步行动
 
 ### 立即执行 (本周)
-1. [ ] 阅读 DKD 论文，理解 TCKD/NCKD
-2. [ ] 设计 DKD Loss 接口
-3. [ ] 准备数据扩展到 100h
+1. [ ] 扩展数据到 100h，完成统计与划分
+2. [ ] 升级 teacher = whisper-small，跑通推理
+3. [ ] 整理 S2/S3/S4 配置与脚本
 
 ### 短期 (Week 4)
-1. [ ] 实现数据扩展
-2. [ ] 升级到 whisper-small
-3. [ ] 实现 S3/S4
-4. [ ] 训练 classical KD baseline
+1. [ ] 训练 CE-only (S2)
+2. [ ] 训练 KD-S2/S3/S4
+3. [ ] 记录训练日志与初步指标
 
 ### 中期 (Week 5)
-1. [ ] 实现 DKD Loss
-2. [ ] 运行 ablation study
-3. [ ] 运行温度实验
-4. [ ] 初步结果分析
+1. [ ] 运行温度实验 (T=1/2/4/6/8)
+2. [ ] 汇总 CE vs KD 对比
+3. [ ] 准备中期展示材料
 
-### 长期 (Week 6-7)
-1. [ ] 完整评估
-2. [ ] 生成所有图表
-3. [ ] 撰写最终报告
-4. [ ] 准备 presentation
+### 长期 (Week 6)
+1. [ ] 统一评估 + Speed-Accuracy 曲线
+2. [ ] 生成所有图表/表格与 Phase2 报告
+3. [ ] 准备 poster / slides
+4. [ ] (可选) 规划 Phase 3 DKD 研究
 
 ---
 
@@ -432,8 +416,12 @@ Week 7 (可选): 扩展实验
 
 🚧 **Phase 2** (进行中):
 - 规模扩展 (small teacher + 100h)
-- DKD 创新实现
-- 完整实验设计
+- Classical KD 全量实验（S2/S3/S4 + 温度）
+- 速度–准确率曲线 & Phase2 报告
+
+🧪 **Phase 3** (规划中):
+- DKD Loss（TCKD/NCKD）实现
+- CE/KD/DKD 全面对比
 
 📊 **预期成果**:
 - 论文级别的图表和表格

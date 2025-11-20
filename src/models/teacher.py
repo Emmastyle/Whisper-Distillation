@@ -85,3 +85,7 @@ class TeacherWhisper(nn.Module):
         """Return the decoder"""
         return self.model.get_decoder()
 
+
+# Alias for backward compatibility
+TeacherWhisperModel = TeacherWhisper
+

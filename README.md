@@ -1,6 +1,9 @@
-# Whisper Knowledge Distillation - Phase 1
+# Whisper Knowledge Distillation
 
-基于 Whisper 的知识蒸馏项目，Phase 1 实现了小规模数据集上的 CE 和 KD 基线。
+基于 Whisper 的知识蒸馏项目，实现渐进式模型压缩与知识传递。
+
+- **Phase 1 (已完成)**: whisper-tiny 基线验证（小数据集）
+- **Phase 2 (进行中)**: whisper-small 完整实验（~9h 数据）+ 温度优化
 
 ## 项目结构
 
@@ -88,17 +91,71 @@ bash scripts/train_kd.sh
 
 ## 文档导航
 
-- **[QUICKSTART.md](QUICKSTART.md)** - 快速开始指南，5 分钟上手
-- **[STRUCTURE.md](STRUCTURE.md)** - 详细的项目结构说明
-- **[PHASE1_COMPLETION.md](PHASE1_COMPLETION.md)** - Phase 1 完成报告
-- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - 项目总结
+### Phase 1 文档
+- **[doc/QUICKSTART.md](doc/QUICKSTART.md)** - 快速开始指南
+- **[doc/STRUCTURE.md](doc/STRUCTURE.md)** - 项目结构说明
+- **[doc/PHASE1_COMPLETION.md](doc/PHASE1_COMPLETION.md)** - Phase 1 完成报告
+- **[doc/Project Plan Phase 1.md](doc/Project%20Plan%20Phase%201.md)** - Phase 1 计划
 
-## 后续计划
+### Phase 2 文档
+- **[doc/Project Plan Phase 2.md](doc/Project%20Plan%20Phase%202.md)** - Phase 2 详细计划
+- **[doc/phase2_execution_guide.md](doc/phase2_execution_guide.md)** - Phase 2 执行指南
+- **[doc/phase2_results.md](doc/phase2_results.md)** - Phase 2 结果报告（模板）
+- **[PHASE2_PROGRESS.md](PHASE2_PROGRESS.md)** - Phase 2 实施进度
 
-Phase 2 将在此基础上：
-- 扩展到更大数据集
-- 实现 DKD（Decoupled Knowledge Distillation）
-- 更多模型压缩技术
+### 整体规划
+- **[doc/Project Plan.md](doc/Project%20Plan.md)** - 完整项目计划
+- **[doc/PROJECT_ROADMAP.md](doc/PROJECT_ROADMAP.md)** - 项目路线图
+
+## Phase 2 快速开始
+
+### 验证 Phase 2 设置
+
+```bash
+cd /home/zz359/workspace-whisper
+source ~/miniconda3/etc/profile.d/conda.sh
+conda activate whisper
+python test_phase2_setup.py
+```
+
+### 运行数据分析
+
+```bash
+python scripts/analyze_data_100h.py
+```
+
+### 开始训练
+
+```bash
+# 批量训练所有模型（CE + KD）
+bash scripts/train_phase2_all.sh
+
+# 或单独训练
+bash scripts/train_ce.sh configs/small_ce_s3.yaml
+bash scripts/train_kd.sh configs/small_kd_s3.yaml
+```
+
+### 温度扫描实验
+
+```bash
+bash scripts/train_temperature_sweep.sh
+```
+
+### 评估所有模型
+
+```bash
+python scripts/evaluate_all_models.py --num_samples 100
+```
+
+详细步骤请参考 **[doc/phase2_execution_guide.md](doc/phase2_execution_guide.md)**
+
+## Phase 3 展望
+
+- DKD (Decoupled Knowledge Distillation)
+  - TCKD (Target-Class KD)
+  - NCKD (Non-Target-Class KD)
+- 模型量化与剪枝
+- 更大规模数据集
 
 ## 快速验证
 

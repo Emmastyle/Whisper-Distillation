@@ -15,6 +15,9 @@ class DataConfig:
     batch_size: int = 8
     num_workers: int = 4
     sample_rate: int = 16000
+    train_ratio: float = 0.9
+    val_ratio: float = 0.05
+    test_ratio: float = 0.05
 
 
 @dataclass

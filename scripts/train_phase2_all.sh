@@ -9,6 +9,11 @@ echo "Phase 2 批量训练脚本"
 echo "========================================"
 echo ""
 
+# 设置 GPU 设备
+export CUDA_VISIBLE_DEVICES=3
+echo "使用 GPU: $CUDA_VISIBLE_DEVICES"
+echo ""
+
 # 激活 conda 环境
 if [ -n "$CONDA_DEFAULT_ENV" ]; then
     echo "当前 conda 环境: $CONDA_DEFAULT_ENV"
@@ -90,4 +95,3 @@ echo "下一步："
 echo "1. 运行温度实验（S3）: scripts/train_temperature_sweep.sh"
 echo "2. 评估所有模型: scripts/evaluate_all_models.py"
 echo ""
-

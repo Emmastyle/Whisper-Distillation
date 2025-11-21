@@ -37,5 +37,5 @@ training:
 
 kd:
   temperature: 1.0  # 温度实验: T=1
-  alpha: 0.5        # CE 和 KD 的权重
+  alpha: 0.1        # CE 和 KD 的权重
 

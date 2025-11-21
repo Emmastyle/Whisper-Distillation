@@ -301,8 +301,8 @@ def train(args):
                 labels=labels,
             )
             
-            # Combined loss: alpha * CE + (1 - alpha) * KD
-            loss = config.kd.alpha * ce_loss + (1 - config.kd.alpha) * kd_loss
+            # Combined loss: (1 - alpha) * CE + alpha * KD
+            loss = (1 - config.kd.alpha) * ce_loss + config.kd.alpha * kd_loss
             
             # Backward pass
             optimizer.zero_grad()

@@ -51,6 +51,8 @@ class KDConfig:
     """Knowledge Distillation configuration"""
     temperature: float = 2.0
     alpha: float = 0.5  # weight for CE loss (1-alpha for KD)
+    dkd_alpha: float = 1.0
+    dkd_beta: float = 8.0
 
 
 @dataclass

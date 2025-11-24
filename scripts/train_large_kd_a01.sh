@@ -5,6 +5,14 @@
 
 set -e  # Exit on error
 
+# Set CUDA device
+export CUDA_VISIBLE_DEVICES=2
+echo "使用 GPU: $CUDA_VISIBLE_DEVICES"
+echo ""
+
+# Set PYTHONPATH to project root
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -35,7 +43,7 @@ for config in "${configs[@]}"; do
     exp_name=$(basename "$config" .yaml)
     
     # Run training
-    python train_kd.py --config "$config"
+    python src/training/train_kd.py --config "$config"
     
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✓ Successfully completed: $exp_name${NC}"
@@ -55,4 +63,3 @@ for config in "${configs[@]}"; do
     exp_name=$(basename "$config" .yaml)
     echo -e "  ✓ $exp_name"
 done
-

@@ -5,6 +5,9 @@
 
 set -e  # Exit on error
 
+# Set PYTHONPATH to project root
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+
 # Configuration
 PROJECT_ROOT="/home/zz359/workspace-whisper"
 LOG_DIR="${PROJECT_ROOT}/logs"

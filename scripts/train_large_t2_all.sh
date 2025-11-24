@@ -6,6 +6,14 @@
 
 set -e  # Exit on error
 
+# Set CUDA device
+export CUDA_VISIBLE_DEVICES=3
+echo "使用 GPU: $CUDA_VISIBLE_DEVICES"
+echo ""
+
+# Set PYTHONPATH to project root
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -32,12 +40,12 @@ configs=(
 
 # Determine which training script to use for each config
 declare -A train_scripts
-train_scripts["configs/large_kd_s2_t2_a05.yaml"]="train_kd.py"
-train_scripts["configs/large_kd_s3_t2_a05.yaml"]="train_kd.py"
-train_scripts["configs/large_kd_s4_t2_a05.yaml"]="train_kd.py"
-train_scripts["configs/large_dkd_s2_t2_g06.yaml"]="train_dkd.py"
-train_scripts["configs/large_dkd_s3_t2_g06.yaml"]="train_dkd.py"
-train_scripts["configs/large_dkd_s4_t2_g06.yaml"]="train_dkd.py"
+train_scripts["configs/large_kd_s2_t2_a05.yaml"]="src/training/train_kd.py"
+train_scripts["configs/large_kd_s3_t2_a05.yaml"]="src/training/train_kd.py"
+train_scripts["configs/large_kd_s4_t2_a05.yaml"]="src/training/train_kd.py"
+train_scripts["configs/large_dkd_s2_t2_g06.yaml"]="src/training/train_dkd.py"
+train_scripts["configs/large_dkd_s3_t2_g06.yaml"]="src/training/train_dkd.py"
+train_scripts["configs/large_dkd_s4_t2_g06.yaml"]="src/training/train_dkd.py"
 
 echo -e "${YELLOW}Total configs to train: ${#configs[@]}${NC}"
 echo -e "${YELLOW}KD models: 3 (S2, S3, S4)${NC}"

@@ -1,0 +1,47 @@
+# DKD (Decoupled Knowledge Distillation) with whisper-large teacher
+# S3 = 3-layer student decoder
+# Temperature = 1.0
+# Alpha = 2.0 (TCKD weight), Beta = 0.3 (NCKD weight), Gamma = 0.6 (CE weight)
+# Top-k = 64 (non-target logits retained in NCKD)
+
+model:
+  teacher_model: "openai/whisper-large"
+  student_decoder_layers: 3
+  student_decoder_heads: 16
+  student_hidden_size: 1024
+  dropout: 0.1
+
+data:
+  dataset_name: "librispeech_asr"
+  dataset_config: "clean"
+  split: "train.100"
+  num_samples: null
+  max_duration: 10.0
+  batch_size: 16
+  num_workers: 8
+  sample_rate: 16000
+  train_ratio: 0.9
+  val_ratio: 0.05
+  test_ratio: 0.05
+
+training:
+  epochs: 15
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_steps: 500
+  gradient_clip: 1.0
+  log_interval: 100
+  eval_interval: 1000
+  save_interval: 2000
+  output_dir: "./outputs/large_dkd_s3_t1_g06"
+  seed: 42
+  fp16: true
+
+dkd:
+  temperature: 1.0
+  alpha: 2.0
+  beta: 0.3
+  gamma: 0.6
+  topk: 64
+
+

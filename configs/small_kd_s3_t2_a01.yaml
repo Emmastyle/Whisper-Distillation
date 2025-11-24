@@ -31,7 +31,7 @@ training:
   log_interval: 100
   eval_interval: 1000
   save_interval: 2000
-  output_dir: "./outputs/small_kd_s3_t2"
+  output_dir: "./outputs/small_kd_s3_t2_a01"
   seed: 42
   fp16: true
 

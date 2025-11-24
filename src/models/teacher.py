@@ -85,6 +85,23 @@ class TeacherWhisper(nn.Module):
         """Return the decoder"""
         return self.model.get_decoder()
 
+    def disable_dropout(self):
+        """Disable dropout layers to ensure deterministic teacher logits"""
+        dropout_attrs = [
+            "dropout",
+            "attention_dropout",
+            "activation_dropout",
+            "encoder_dropout",
+            "decoder_dropout",
+        ]
+        for attr in dropout_attrs:
+            if hasattr(self.model.config, attr):
+                setattr(self.model.config, attr, 0.0)
+
+        for module in self.model.modules():
+            if isinstance(module, nn.Dropout):
+                module.p = 0.0
+
 
 # Alias for backward compatibility
 TeacherWhisperModel = TeacherWhisper

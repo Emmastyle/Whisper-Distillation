@@ -311,6 +311,22 @@ def train(args):
         logger.info(
             f"Epoch {epoch+1} - Val Loss: {val_loss:.4f}, WER: {wer:.2f}%, CER: {cer:.2f}%"
         )
+        
+        # Update best model if epoch evaluation is better
+        if wer < best_wer:
+            best_wer = wer
+            save_path = output_dir / "best_model.pt"
+            torch.save({
+                'epoch': epoch + 1,
+                'global_step': global_step,
+                'model_state_dict': model.student_decoder.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'scheduler_state_dict': scheduler.state_dict(),
+                'wer': wer,
+                'cer': cer,
+                'config': config,
+            }, save_path)
+            logger.info(f"Saved best model (WER: {wer:.2f}%) to {save_path}")
     
     logger.info("Training completed!")
     logger.info(f"Best WER: {best_wer:.2f}%")

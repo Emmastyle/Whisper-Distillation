@@ -54,12 +54,23 @@ class KDConfig:
 
 
 @dataclass
+class DKDConfig:
+    """Decoupled Knowledge Distillation configuration"""
+    temperature: float = 1.0
+    alpha: float = 2.0
+    beta: float = 0.3
+    gamma: float = 0.6
+    topk: Optional[int] = None
+
+
+@dataclass
 class Config:
     """Main configuration"""
     data: DataConfig = field(default_factory=DataConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
     training: TrainingConfig = field(default_factory=TrainingConfig)
     kd: Optional[KDConfig] = None  # Only for KD training
+    dkd: Optional[DKDConfig] = None  # Only for DKD training
 
 
 def load_config(config_path: str) -> Config:
@@ -75,10 +86,15 @@ def load_config(config_path: str) -> Config:
     if 'kd' in config_dict:
         kd_config = KDConfig(**config_dict['kd'])
     
+    dkd_config = None
+    if 'dkd' in config_dict:
+        dkd_config = DKDConfig(**config_dict['dkd'])
+
     return Config(
         data=data_config,
         model=model_config,
         training=training_config,
-        kd=kd_config
+        kd=kd_config,
+        dkd=dkd_config
     )
 

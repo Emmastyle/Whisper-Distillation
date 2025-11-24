@@ -1,0 +1,40 @@
+run_id,status,config_file,teacher_model,student_type,loss_type,temperature_T,alpha,beta,gamma,dataset_str,samples_str,batch_size,learning_rate,epochs,max_duration,best_val_wer,best_val_cer,best_epoch,final_train_loss,train_time,note_short
+small_ce_s2_20251120_123337,failed,configs/small_ce_s2.yaml,openai/whisper-small,S2,CE-only,,,,,librispeech_asr/clean (train.100),N/A,16,0.0001,15,10.0,,,,,N/A,Config schema mismatch (train_ratio)
+small_ce_s2_20251120_123448,incomplete,configs/small_ce_s2.yaml,openai/whisper-small,S2,CE-only,,,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,97.86,86.8,1,4.8838,0:06:36,Stopped early
+small_ce_s2_20251120_131537,failed,configs/small_ce_s2.yaml,openai/whisper-small,S2,CE-only,,,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,,,,,0:00:03,CUDA OOM
+small_ce_s2_20251120_135049,completed,configs/small_ce_s2.yaml,openai/whisper-small,S2,CE-only,,,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,22.74,11.66,14,0.246,1:09:47,
+small_ce_s3_20251120_123342,empty,configs/small_ce_s3.yaml,openai/whisper-small,S3,CE-only,,,,,librispeech_asr/clean (train.100),N/A,16,0.0001,15,10.0,,,,,N/A,Empty log
+small_ce_s3_20251120_131547,empty,configs/small_ce_s3.yaml,openai/whisper-small,S3,CE-only,,,,,librispeech_asr/clean (train.100),N/A,16,0.0001,15,10.0,,,,,N/A,Empty log
+small_ce_s3_20251120_150042,completed,configs/small_ce_s3.yaml,openai/whisper-small,S3,CE-only,,,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,16.54,7.36,15,0.1255,1:15:17,
+small_ce_s4_20251120_161607,completed,configs/small_ce_s4.yaml,openai/whisper-small,S4,CE-only,,,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,16.27,6.9,15,0.0559,1:20:01,
+small_kd_s2_20251120_173614,completed,configs/small_kd_s2.yaml,openai/whisper-small,S2,KD,4.0,0.5,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,24.65,12.3,15,0.5611,1:34:15,
+small_kd_s2_t1_20251120_214731,incomplete,configs/small_kd_s2_t1_a01.yaml,openai/whisper-small,S2,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,,,,,0:00:08,Stopped early
+small_kd_s2_t1_20251120_214837,incomplete,configs/small_kd_s2_t1_a01.yaml,openai/whisper-small,S2,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,,,,,0:00:08,Stopped early
+small_kd_s2_t1_20251120_214932,completed,configs/small_kd_s2_t1_a01.yaml,openai/whisper-small,S2,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,58.05,51.7,12,0.5452,1:01:07,
+small_kd_s3_20251120_191034,completed,configs/small_kd_s3.yaml,openai/whisper-small,S3,KD,4.0,0.5,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,56.8,82.64,8,0.4341,2:28:57,
+small_kd_s3_t1_20251120_225045,incomplete,configs/small_kd_s3_t1_a01.yaml,openai/whisper-small,S3,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,45.54,33.41,6,0.6962,0:26:19,Stopped early
+small_kd_s4_20251120_213937,incomplete,configs/small_kd_s4.yaml,openai/whisper-small,S4,KD,4.0,0.5,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,50.82,99.97,8,0.4463,1:45:41,Stopped early
+train_S2-T1_20251120_233024,incomplete,configs/small_kd_s2_t1_a01.yaml,openai/whisper-small,S2,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,,,,,0:00:06,Stopped early
+train_S2-T1_20251120_233053,completed,configs/small_kd_s2_t1_a01.yaml,openai/whisper-small,S2,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,36.29,22.59,7,0.364,0:50:43,
+train_S2-T1_20251121_002552,failed,,,N/A,Unknown,,,,,N/A,N/A,,,,,,,,,N/A,Config schema mismatch (warmup_ratio)
+train_S2-T1_20251121_003407,failed,configs/small_dkd_s2_t1_a08.yaml,openai/whisper-small,S2,DKD,1.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),N/A,16,0.0001,15,10.0,,,,,0:01:55,TypeError: WhisperASRDataset.__init__() got an unexpected ke
+train_S2-T1_20251121_010445,incomplete,configs/small_dkd_s2_t1_a08.yaml,openai/whisper-small,S2,DKD,1.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),raw 500,16,0.0001,15,10.0,,,,6.7027,0:01:29,Stopped early
+train_S2-T1_20251121_011040,incomplete,configs/small_dkd_s2_t1_a08.yaml,openai/whisper-small,S2,DKD,1.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),N/A,16,0.0001,15,10.0,,,,,0:00:00,Stopped early
+train_S2-T1_20251121_011115,completed,configs/small_dkd_s2_t1_a08.yaml,openai/whisper-small,S2,DKD,1.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),raw 500,16,0.0001,15,10.0,27.21,18.73,15,0.5455,1:06:55,
+train_S2-T2_20251121_002142,completed,configs/small_kd_s2_t2_a01.yaml,openai/whisper-small,S2,KD,2.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,57.83,52.69,5,0.38,0:58:00,
+train_S2-T2_20251121_002557,failed,,,N/A,Unknown,,,,,N/A,N/A,,,,,,,,,N/A,Config schema mismatch (warmup_ratio)
+train_S2-T2_20251121_003608,failed,configs/small_dkd_s2_t2_a08.yaml,openai/whisper-small,S2,DKD,2.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),N/A,16,0.0001,15,10.0,,,,,0:01:55,TypeError: WhisperASRDataset.__init__() got an unexpected ke
+train_S2-T2_20251121_021815,completed,configs/small_dkd_s2_t2_a08.yaml,openai/whisper-small,S2,DKD,2.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),raw 500,16,0.0001,15,10.0,59.3,44.68,5,0.377,2:56:28,
+train_S3-T1_20251121_002603,failed,,,N/A,Unknown,,,,,N/A,N/A,,,,,,,,,N/A,Config schema mismatch (warmup_ratio)
+train_S3-T1_20251121_003809,incomplete,configs/small_dkd_s3_t1_a08.yaml,openai/whisper-small,S3,DKD,1.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),N/A,16,0.0001,15,10.0,,,,,0:00:00,Stopped early
+train_S3-T1_20251121_011947,completed,configs/small_kd_s3_t1_a01.yaml,openai/whisper-small,S3,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,19.26,9.79,15,0.2474,0:43:34,
+train_S3-T1_20251121_051450,completed,configs/small_dkd_s3_t1_a08.yaml,openai/whisper-small,S3,DKD,1.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),raw 500,16,0.0001,15,10.0,29.19,31.32,11,0.4552,2:35:10,
+train_S3-T2_20251121_002608,failed,,,N/A,Unknown,,,,,N/A,N/A,,,,,,,,,N/A,Config schema mismatch (warmup_ratio)
+train_S3-T2_20251121_020326,completed,configs/small_kd_s3_t2_a01.yaml,openai/whisper-small,S3,KD,2.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,21.49,11.1,9,0.2482,0:53:09,
+train_S3-T2_20251121_075005,completed,configs/small_dkd_s3_t2_a08.yaml,openai/whisper-small,S3,DKD,2.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),raw 500,16,0.0001,15,10.0,55.83,45.56,4,0.3,3:15:07,
+train_S4-T1_20251121_002613,failed,,,N/A,Unknown,,,,,N/A,N/A,,,,,,,,,N/A,Config schema mismatch (warmup_ratio)
+train_S4-T1_20251121_025642,completed,configs/small_kd_s4_t1_a01.yaml,openai/whisper-small,S4,KD,1.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,17.52,11.08,15,0.1883,0:44:21,
+train_S4-T1_20251121_110519,completed,configs/small_dkd_s4_t1_a08.yaml,openai/whisper-small,S4,DKD,1.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),raw 500,16,0.0001,15,10.0,17.29,23.9,14,0.3899,2:19:57,
+train_S4-T2_20251121_002618,failed,,,N/A,Unknown,,,,,N/A,N/A,,,,,,,,,N/A,Config schema mismatch (warmup_ratio)
+train_S4-T2_20251121_034108,completed,configs/small_kd_s4_t2_a01.yaml,openai/whisper-small,S4,KD,2.0,0.1,,,librispeech_asr/clean (train.100),5266/100,16,0.0001,15,10.0,24.54,36.12,8,0.1802,1:04:11,
+train_S4-T2_20251121_132521,incomplete,configs/small_dkd_s4_t2_a08.yaml,openai/whisper-small,S4,DKD,2.0,2.0,0.3,0.6,librispeech_asr/clean (train.100),raw 500,16,0.0001,15,10.0,24.48,25.35,6,0.3804,2:00:59,Stopped early

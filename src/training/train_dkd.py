@@ -15,7 +15,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torch.optim import AdamW
 from tqdm import tqdm
 from pathlib import Path
@@ -352,7 +352,8 @@ def train(args):
     logger.info("Loading datasets")
     logger.info(f"  Dataset: {config.data.dataset_name}")
     logger.info(f"  Config: {config.data.dataset_config}")
-    logger.info(f"  Split: {config.data.split}")
+    train_split = config.data.split
+    logger.info(f"  Split: {train_split}")
     
     # Create feature extractor
     feature_extractor = WhisperFeatureExtractor.from_pretrained(config.model.teacher_model)
@@ -361,7 +362,7 @@ def train(args):
     train_dataset = WhisperASRDataset(
         dataset_name=config.data.dataset_name,
         dataset_config=config.data.dataset_config,
-        split=config.data.split,
+        split=train_split,
         feature_extractor=feature_extractor,
         tokenizer=tokenizer,
         max_duration=config.data.max_duration,
@@ -369,21 +370,10 @@ def train(args):
         sample_rate=config.data.sample_rate,
     )
     
-    # For validation, use a small subset (10% of training data or 500 samples, whichever is smaller)
-    val_samples = min(500, len(train_dataset) // 10)
-    logger.info(f"  Using {val_samples} samples for validation")
-    
-    val_dataset = WhisperASRDataset(
-        dataset_name=config.data.dataset_name,
-        dataset_config=config.data.dataset_config,
-        split=config.data.split,
-        feature_extractor=feature_extractor,
-        tokenizer=tokenizer,
-        max_duration=config.data.max_duration,
-        num_samples=val_samples,
-        sample_rate=config.data.sample_rate,
-    )
-    
+    # Match KD: split the training split into train/val (10% capped at 100)
+    val_size = min(100, len(train_dataset) // 10)
+    train_size = len(train_dataset) - val_size
+    train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
     logger.info(f"Train samples: {len(train_dataset)}")
     logger.info(f"Val samples: {len(val_dataset)}")
     

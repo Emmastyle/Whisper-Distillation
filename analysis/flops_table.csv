@@ -1,0 +1,9 @@
+Model,Type,Teacher,Layers,Heads,GFLOPs
+teacher_small,teacher,openai/whisper-small,-,-,172.85
+teacher_large,teacher,openai/whisper-large,-,-,1230.07
+student_s2_smallT,student,openai/whisper-small,2,12,142.75
+student_s3_smallT,student,openai/whisper-small,3,12,145.76
+student_s4_smallT,student,openai/whisper-small,4,12,148.77
+student_s2_largeT,student,openai/whisper-large,2,16,979.31
+student_s3_largeT,student,openai/whisper-large,3,16,987.67
+student_s4_largeT,student,openai/whisper-large,4,16,996.03

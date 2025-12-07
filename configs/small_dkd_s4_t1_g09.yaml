@@ -1,0 +1,44 @@
+# DKD (Decoupled Knowledge Distillation) with whisper-small teacher
+# S4 = 4-layer student decoder
+# Temperature = 1.0
+# Alpha = 2.0 (TCKD weight), Beta = 0.3 (NCKD weight), Gamma = 0.9 (CE weight)
+# Top-k = 64 (non-target logits retained in NCKD)
+
+model:
+  teacher_model: "openai/whisper-small"
+  student_decoder_layers: 4
+  student_decoder_heads: 12
+  student_hidden_size: 768
+  dropout: 0.1
+
+data:
+  dataset_name: "librispeech_asr"
+  dataset_config: "clean"
+  split: "train.100"
+  num_samples: null
+  max_duration: 10.0
+  batch_size: 16
+  num_workers: 8
+  sample_rate: 16000
+
+training:
+  epochs: 15
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_steps: 500
+  gradient_clip: 1.0
+  log_interval: 100
+  eval_interval: 1000
+  save_interval: 2000
+  output_dir: "./outputs/small_dkd_s4_t1_g09"
+  seed: 42
+  fp16: true
+
+dkd:
+  temperature: 1.0   # Temperature for softening
+  alpha: 2.0         # TCKD (Target Class KD) weight
+  beta: 0.3          # NCKD (Non-target Class KD) weight - must be << alpha
+  gamma: 0.9         # CE loss weight (1 - gamma for DKD) - CE should dominate
+  topk: 64           # Number of non-target logits retained (None = all)
+
+

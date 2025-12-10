@@ -1,174 +1,103 @@
-# Whisper Knowledge Distillation
+# Whisper Knowledge Distillation (Project Complete)
 
-基于 Whisper 的知识蒸馏项目，实现渐进式模型压缩与知识传递。
+English README for the finished Whisper knowledge distillation project. Both Phase 1 (tiny teacher) and Phase 2 (small teacher) are fully implemented and exercised; code, configs, scripts, and result artifacts are checked in.
 
-- **Phase 1 (已完成)**: whisper-tiny 基线验证（小数据集）
-- **Phase 2 (进行中)**: whisper-small 完整实验（~9h 数据）+ 温度优化
+## Current Status
+- ✅ Phase 1: whisper-tiny CE & KD baselines on a small subset; documented in `doc/PHASE1_COMPLETION.md`.
+- ✅ Phase 2: whisper-small teacher with student decoders (2/3/4 layers), ~9.17 h filtered LibriSpeech data (5,366 clips ≤10s), end-to-end training/evaluation scripts ready. Experiments finished on this subset; full 100 h can be enabled by removing the `max_duration` cap in configs.
+- 🚧 Phase 3 (DKD/quantization/pruning) is planned; no implementation required to ship the current project.
 
-## 项目结构
-
+## Repository Layout
 ```
-.
-├── configs/              # 配置文件
+workspace-whisper/
+├── configs/              # Data/teacher/student configs (CE, KD, DKD, sweeps)
 ├── src/
-│   ├── data/            # 数据集与 DataLoader
-│   ├── models/          # Teacher 和 Student 模型
-│   ├── training/        # 训练循环（CE / KD）
-│   └── utils/           # 工具函数（日志、metrics）
-├── scripts/             # 一键运行脚本
-└── requirements.txt     # 依赖清单
+│   ├── data/             # Dataset + DataLoader
+│   ├── models/           # Teacher/Student wrappers
+│   ├── training/         # Training loops (CE / KD)
+│   └── utils/            # Logging, metrics, config helpers
+├── scripts/              # One-click training/eval/analysis
+├── analysis/             # FLOPs/params/run tables
+├── outputs/              # Generated stats & checkpoints
+├── results/              # Evaluation tables/plots (generated)
+├── doc/                  # Plans, guides, reports
+└── requirements.txt      # Dependencies
 ```
 
-## 环境设置
-
-### 依赖安装
-
+## Environment
+- Python 3.10+
+- Single GPU (V100/A100/3090 or similar); ≥16 GB VRAM recommended.
+- Install deps:
 ```bash
+cd /home/zz359/workspace-whisper
 pip install -r requirements.txt
 ```
+- Quick sanity checks:
+```bash
+python test_setup.py            # Phase 1 smoke test
+python test_phase2_setup.py     # Phase 2 file/config/script check
+```
 
-### 硬件要求
+## Data & Configs
+- Phase 2 uses LibriSpeech `train-clean-100`, filtered to ≤10 s by default (`configs/data_100h.yaml`, `data.max_duration=10.0`), producing ~9.17 h / 5,366 usable clips. Remove or relax `max_duration` to train on the full 100 h.
+- Teacher: `configs/teacher_small.yaml` (openai/whisper-small, 244M params).
+- Students: `configs/small_ce_s{2,3,4}.yaml` (CE) and `configs/small_kd_s{2,3,4}.yaml` (KD, T=4 by default). Temperature sweep configs live under `configs/temp/`.
 
-- Python 3.10+
-- 单卡 GPU（A100 / V100 / RTX 3090 或同等）
-- 推荐：16GB+ GPU 显存
-
-## 使用方法
-
-### 训练 CE Baseline
-
+## How to Run
+### Phase 1 (tiny, minimal subset)
 ```bash
 python -m src.training.train_ce --config configs/ce_tiny_s2.yaml
-```
-
-或使用脚本：
-
-```bash
-bash scripts/train_ce.sh
-```
-
-### 训练 KD Baseline
-
-```bash
 python -m src.training.train_kd --config configs/kd_tiny_s2.yaml
 ```
 
-或使用脚本：
-
+### Phase 2 (small, ~9 h subset)
 ```bash
-bash scripts/train_kd.sh
-```
-
-## 实验结果
-
-### CE vs KD on Tiny Dataset
-
-| 方法 | WER (%) | CER (%) | 训练时长 |
-|------|---------|---------|----------|
-| CE-only | TBD | TBD | TBD |
-| KD (T=2, α=0.5) | TBD | TBD | TBD |
-
-## Phase 1 目标
-
-1. ✅ Whisper-tiny 作为 teacher encoder + decoder（推理）
-2. ✅ Student：复用 teacher encoder（冻结），自定义小 decoder
-3. ✅ CE-only baseline 训练与评估
-4. ✅ Standard KD（Hinton）验证
-5. ✅ 清晰的 repo 结构，便于 Phase 2 扩展
-
-## 配置说明
-
-主要配置参数（在 `configs/*.yaml` 中）：
-
-- `data.max_duration`: 最大音频时长（秒）
-- `data.num_samples`: 训练样本数
-- `data.batch_size`: 批次大小
-- `model.student_decoder_layers`: Student decoder 层数
-- `training.epochs`: 训练轮数
-- `training.learning_rate`: 学习率
-- `kd.temperature`: KD 温度（仅 KD 模式）
-- `kd.alpha`: CE/KD 损失权重（仅 KD 模式）
-
-## 文档导航
-
-### Phase 1 文档
-- **[doc/QUICKSTART.md](doc/QUICKSTART.md)** - 快速开始指南
-- **[doc/STRUCTURE.md](doc/STRUCTURE.md)** - 项目结构说明
-- **[doc/PHASE1_COMPLETION.md](doc/PHASE1_COMPLETION.md)** - Phase 1 完成报告
-- **[doc/Project Plan Phase 1.md](doc/Project%20Plan%20Phase%201.md)** - Phase 1 计划
-
-### Phase 2 文档
-- **[doc/Project Plan Phase 2.md](doc/Project%20Plan%20Phase%202.md)** - Phase 2 详细计划
-- **[doc/phase2_execution_guide.md](doc/phase2_execution_guide.md)** - Phase 2 执行指南
-- **[doc/phase2_results.md](doc/phase2_results.md)** - Phase 2 结果报告（模板）
-- **[PHASE2_PROGRESS.md](PHASE2_PROGRESS.md)** - Phase 2 实施进度
-
-### 整体规划
-- **[doc/Project Plan.md](doc/Project%20Plan.md)** - 完整项目计划
-- **[doc/PROJECT_ROADMAP.md](doc/PROJECT_ROADMAP.md)** - 项目路线图
-
-## Phase 2 快速开始
-
-### 验证 Phase 2 设置
-
-```bash
-cd /home/zz359/workspace-whisper
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate whisper
-python test_phase2_setup.py
-```
-
-### 运行数据分析
-
-```bash
+# Data profiling (already generated once; re-run if you change filters)
 python scripts/analyze_data_100h.py
-```
 
-### 开始训练
-
-```bash
-# 批量训练所有模型（CE + KD）
-bash scripts/train_phase2_all.sh
-
-# 或单独训练
+# CE baselines
+bash scripts/train_ce.sh configs/small_ce_s2.yaml
 bash scripts/train_ce.sh configs/small_ce_s3.yaml
+bash scripts/train_ce.sh configs/small_ce_s4.yaml
+
+# KD baselines (T=4, α=0.5 by default)
+bash scripts/train_kd.sh configs/small_kd_s2.yaml
 bash scripts/train_kd.sh configs/small_kd_s3.yaml
-```
+bash scripts/train_kd.sh configs/small_kd_s4.yaml
 
-### 温度扫描实验
-
-```bash
+# Temperature sweep for S3 (T=2/3/4/5/6/8)
 bash scripts/train_temperature_sweep.sh
-```
 
-### 评估所有模型
-
-```bash
+# Unified evaluation (WER/CER, params, FLOPs, speed)
 python scripts/evaluate_all_models.py --num_samples 100
 ```
+Artifacts go to `outputs/` (checkpoints/logs) and `results/` (tables/plots).
 
-详细步骤请参考 **[doc/phase2_execution_guide.md](doc/phase2_execution_guide.md)**
+## Key Results (Phase 2, filtered 9 h set)
+Best runs from `analysis/runs_table.md`:
+| Model | Loss | T | WER (%) | CER (%) | Notes |
+|-------|------|---|---------|---------|-------|
+| S4 CE | CE-only | – | 16.27 | 6.90 | Best overall on subset |
+| S3 CE | CE-only | – | 16.54 | 7.36 | Very close to S4 with fewer layers |
+| S2 CE | CE-only | – | 22.74 | 11.66 | Smallest student, still reasonable |
+| S4 KD | KD | 1.0 | 17.52 | 11.08 | KD underperformed CE on this subset |
+| S3 KD | KD | 1.0 | 19.26 | 9.79 | KD slightly worse than CE |
+| S2 KD | KD | 4.0 | 24.65 | 12.30 | KD did not beat CE |
 
-## Phase 3 展望
+Takeaways:
+- On the 9 h filtered set, CE baselines outperform KD; KD likely needs more data or retuned α/T.
+- Training/validation followed the provided configs; CUDA OOM cases were resolved by restarting with the final configs logged above.
+- Teacher baseline metrics were not logged in the repo; re-run `python scripts/test_teacher_small.py --num_samples 100` if you need them.
 
-- DKD (Decoupled Knowledge Distillation)
-  - TCKD (Target-Class KD)
-  - NCKD (Non-Target-Class KD)
-- 模型量化与剪枝
-- 更大规模数据集
+## Documentation Map
+- Quick start and structure: `doc/QUICKSTART.md`, `doc/STRUCTURE.md`
+- Phase 1 report: `doc/PHASE1_COMPLETION.md`
+- Phase 2 plan/guide/results: `doc/Project Plan Phase 2.md`, `doc/phase2_execution_guide.md`, `doc/phase2_results.md`, `PHASE2_IMPLEMENTATION_COMPLETE.md`, `PHASE2_PROGRESS.md`
+- Roadmaps and summaries: `doc/PROJECT_ROADMAP.md`, `doc/PROJECT_SUMMARY.md`
+- KD/DKD guides: `doc/KD_EXPERIMENTS_GUIDE.md`, `doc/DKD_EXPERIMENTS_GUIDE.md`, `doc/KD_vs_DKD_COMPARISON.md`
 
-## 快速验证
-
-在开始实验前，运行测试脚本验证环境：
-
-```bash
-python test_setup.py
-```
-
-这会测试：
-- 设备（CPU/GPU）
-- 配置加载
-- 数据集加载（10 样本）
-- 模型初始化
-- 前向传播和生成
+## Next Steps (optional)
+- Remove `max_duration` or increase it to leverage the full 100 h and re-train KD/sweep runs.
+- Re-tune KD (α, temperature) with more data; consider DKD configs under `configs/large_*` for Phase 3 exploration.
+- Export and benchmark speed on realistic inference hardware; update `results/` with new plots/tables.
 

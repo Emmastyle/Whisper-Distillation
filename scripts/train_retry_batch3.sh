@@ -5,15 +5,14 @@
 set -e  # Exit on error
 
 # Set CUDA device
-export CUDA_VISIBLE_DEVICES=3
 
 # Set PYTHONPATH to project root
-PROJECT_ROOT="/home/zz359/workspace-whisper"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
 cd "${PROJECT_ROOT}"
 
 echo "============================================="
-echo "Retry Training - Batch 3 (GPU 3)"
+echo "Retry Training - Batch 3 (selected device)"
 echo "2 Large Gamma=0.9 + 2 Small Gamma=0.9"
 echo "============================================="
 echo ""

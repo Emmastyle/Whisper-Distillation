@@ -10,13 +10,11 @@ echo "温度扫描实验 - S3 Student"
 echo "========================================"
 echo ""
 
-# 激活 conda 环境
+# Report the active environment; dependency management is left to the caller.
 if [ -n "$CONDA_DEFAULT_ENV" ]; then
     echo "当前 conda 环境: $CONDA_DEFAULT_ENV"
 else
-    echo "激活 whisper 环境..."
-    source ~/miniconda3/etc/profile.d/conda.sh
-    conda activate whisper
+    echo "未检测到 conda 环境，将使用: $(command -v python)"
 fi
 
 # 获取项目根目录
@@ -66,9 +64,7 @@ data:
   batch_size: 16
   num_workers: 8
   sample_rate: 16000
-  train_ratio: 0.9
-  val_ratio: 0.05
-  test_ratio: 0.05
+  validation_size: 100
 
 training:
   epochs: 15
@@ -115,4 +111,3 @@ echo ""
 echo "下一步："
 echo "运行评估脚本分析不同温度的效果: python scripts/evaluate_all_models.py"
 echo ""
-

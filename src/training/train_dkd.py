@@ -15,12 +15,12 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from tqdm import tqdm
 from pathlib import Path
 
-from src.data import WhisperASRDataset, whisper_collate_fn
+from src.data import WhisperASRDataset, split_dataset, whisper_collate_fn
 from src.models import TeacherWhisper, StudentASRModel
 from src.utils.config import load_config
 from src.utils.logger import setup_logger
@@ -35,6 +35,16 @@ def set_seed(seed: int):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def resolve_device(requested: str) -> torch.device:
+    """Resolve an explicit device or select CUDA automatically when available."""
+    if requested == "auto":
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(requested)
+    if device.type == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError(f"CUDA device requested ({requested}), but CUDA is unavailable.")
+    return device
 
 
 def prepare_decoder_input_ids(
@@ -310,7 +320,7 @@ def train(args):
     set_seed(config.training.seed)
     
     # Device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = resolve_device(args.device)
     logger.info(f"Using device: {device}")
     
     # Load tokenizer
@@ -370,10 +380,11 @@ def train(args):
         sample_rate=config.data.sample_rate,
     )
     
-    # Match KD: split the training split into train/val (10% capped at 100)
-    val_size = min(100, len(train_dataset) // 10)
-    train_size = len(train_dataset) - val_size
-    train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
+    train_dataset, val_dataset = split_dataset(
+        train_dataset,
+        config.training.seed,
+        config.data.validation_size,
+    )
     logger.info(f"Train samples: {len(train_dataset)}")
     logger.info(f"Val samples: {len(val_dataset)}")
     
@@ -384,7 +395,7 @@ def train(args):
         shuffle=True,
         num_workers=config.data.num_workers,
         collate_fn=whisper_collate_fn,
-        pin_memory=True,
+        pin_memory=config.data.pin_memory and device.type == "cuda",
     )
     
     val_loader = DataLoader(
@@ -393,7 +404,7 @@ def train(args):
         shuffle=False,
         num_workers=config.data.num_workers,
         collate_fn=whisper_collate_fn,
-        pin_memory=True,
+        pin_memory=config.data.pin_memory and device.type == "cuda",
     )
     
     # Optimizer
@@ -425,8 +436,9 @@ def train(args):
     logger.info(f"  NCKD top-k: {config.dkd.topk if config.dkd.topk is not None else 'all'}")
     
     # Mixed precision training
-    scaler = torch.cuda.amp.GradScaler(enabled=config.training.fp16)
-    logger.info(f"Mixed precision training: {config.training.fp16}")
+    use_fp16 = config.training.fp16 and device.type == "cuda"
+    scaler = torch.cuda.amp.GradScaler(enabled=use_fp16)
+    logger.info(f"Mixed precision training: {use_fp16}")
     
     # Training loop
     logger.info("Starting training...")
@@ -456,7 +468,7 @@ def train(args):
             )
             
             # Mixed precision forward pass
-            with torch.cuda.amp.autocast(enabled=config.training.fp16):
+            with torch.cuda.amp.autocast(enabled=use_fp16):
                 # Forward pass with teacher logits
                 ce_loss, student_logits, teacher_logits = model(
                     input_features=input_features,
@@ -621,7 +633,11 @@ if __name__ == "__main__":
         required=True,
         help="Path to config file"
     )
+    parser.add_argument(
+        "--device",
+        default="auto",
+        help="Torch device (auto, cpu, cuda, or cuda:N; default: auto)",
+    )
     
     args = parser.parse_args()
     train(args)
-

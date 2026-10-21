@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="470" viewBox="0 0 1000 470" role="img" aria-labelledby="title desc">
+  <title id="title">Phase 2 validation word error rates</title>
+  <desc id="desc">Horizontal bars compare CE and selected KD validation WER for S2, S3, and S4 students on the filtered nine-hour subset. Lower is better.</desc>
+  <style>
+    .title{font:700 23px system-ui,sans-serif;fill:#0f172a}.sub{font:14px system-ui,sans-serif;fill:#64748b}.label{font:15px system-ui,sans-serif;fill:#334155}.value{font:600 14px system-ui,sans-serif;fill:#0f172a}.axis{stroke:#cbd5e1;stroke-width:1}.tick{font:12px system-ui,sans-serif;fill:#64748b}
+  </style>
+  <rect width="1000" height="470" rx="24" fill="#f8fafc"/>
+  <text x="500" y="40" text-anchor="middle" class="title">Phase 2 Validation WER</text>
+  <text x="500" y="65" text-anchor="middle" class="sub">filtered 9 h subset · lower is better</text>
+
+  <line x1="260" y1="95" x2="260" y2="390" class="axis"/><line x1="485" y1="95" x2="485" y2="390" class="axis"/><line x1="710" y1="95" x2="710" y2="390" class="axis"/><line x1="935" y1="95" x2="935" y2="390" class="axis"/>
+  <text x="260" y="420" text-anchor="middle" class="tick">0</text><text x="485" y="420" text-anchor="middle" class="tick">10</text><text x="710" y="420" text-anchor="middle" class="tick">20</text><text x="935" y="420" text-anchor="middle" class="tick">30% WER</text>
+
+  <text x="238" y="126" text-anchor="end" class="label">S2 · CE</text><rect x="260" y="108" width="512" height="25" rx="5" fill="#22c55e"/><text x="780" y="126" class="value">22.74</text>
+  <text x="238" y="168" text-anchor="end" class="label">S2 · KD (T4)</text><rect x="260" y="150" width="555" height="25" rx="5" fill="#3b82f6"/><text x="823" y="168" class="value">24.65</text>
+
+  <text x="238" y="224" text-anchor="end" class="label">S3 · CE</text><rect x="260" y="206" width="372" height="25" rx="5" fill="#22c55e"/><text x="640" y="224" class="value">16.54</text>
+  <text x="238" y="266" text-anchor="end" class="label">S3 · KD (T1)</text><rect x="260" y="248" width="433" height="25" rx="5" fill="#3b82f6"/><text x="701" y="266" class="value">19.26</text>
+
+  <text x="238" y="322" text-anchor="end" class="label">S4 · CE</text><rect x="260" y="304" width="366" height="25" rx="5" fill="#22c55e"/><text x="634" y="322" class="value">16.27</text>
+  <text x="238" y="364" text-anchor="end" class="label">S4 · KD (T1)</text><rect x="260" y="346" width="394" height="25" rx="5" fill="#3b82f6"/><text x="662" y="364" class="value">17.52</text>
+</svg>

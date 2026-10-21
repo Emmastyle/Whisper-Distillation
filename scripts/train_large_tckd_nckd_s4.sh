@@ -1,16 +1,15 @@
 #!/bin/bash
-# Train TCKD-only and NCKD-only (S4) on CUDA:3
+# Train TCKD-only and NCKD-only (S4) on selected device
 
 set -e
 
-export CUDA_VISIBLE_DEVICES=3
 
-PROJECT_ROOT="/home/zz359/workspace-whisper"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
 cd "${PROJECT_ROOT}"
 
 echo "====================================="
-echo "TCKD/NCKD S4 Training (CUDA:3)"
+echo "TCKD/NCKD S4 Training (selected device)"
 echo "====================================="
 echo ""
 

@@ -10,17 +10,14 @@ echo "========================================"
 echo ""
 
 # 设置 GPU 设备
-export CUDA_VISIBLE_DEVICES=3
-echo "使用 GPU: $CUDA_VISIBLE_DEVICES"
+echo "使用 Device: ${CUDA_VISIBLE_DEVICES:-auto}"
 echo ""
 
-# 激活 conda 环境
+# Report the active environment; dependency management is left to the caller.
 if [ -n "$CONDA_DEFAULT_ENV" ]; then
     echo "当前 conda 环境: $CONDA_DEFAULT_ENV"
 else
-    echo "激活 whisper 环境..."
-    source ~/miniconda3/etc/profile.d/conda.sh
-    conda activate whisper
+    echo "未检测到 conda 环境，将使用: $(command -v python)"
 fi
 
 # 获取脚本所在目录的父目录（项目根目录）
@@ -80,9 +77,9 @@ echo "Step 2: KD 训练（S2/S3/S4，温度 T=4）"
 echo "========================================"
 echo ""
 
-train_model "configs/small_kd_s2.yaml" "small_kd_s2"
-train_model "configs/small_kd_s3.yaml" "small_kd_s3"
-train_model "configs/small_kd_s4.yaml" "small_kd_s4"
+train_model "configs/small_kd_s2_t4_a05.yaml" "small_kd_s2_t4_a05"
+train_model "configs/small_kd_s3_t4_a05.yaml" "small_kd_s3_t4_a05"
+train_model "configs/small_kd_s4_t4_a05.yaml" "small_kd_s4_t4_a05"
 
 echo "========================================"
 echo "✓ Phase 2 所有模型训练完成！"

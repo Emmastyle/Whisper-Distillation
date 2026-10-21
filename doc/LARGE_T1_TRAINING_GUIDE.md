@@ -19,7 +19,7 @@
 ### 方式 1: 批量运行所有实验（推荐）
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 bash scripts/train_large_t1_all.sh
 ```
 
@@ -39,7 +39,7 @@ bash scripts/train_large_t1_all.sh
 #### Classical KD 实验
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 
 # S2 学生
 python src/training/train_kd.py --config configs/large_kd_s2_t1.yaml
@@ -54,7 +54,7 @@ python src/training/train_kd.py --config configs/large_kd_s4_t1.yaml
 #### DKD 实验
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 
 # S2 学生
 python src/training/train_dkd.py --config configs/large_dkd_s2_t1.yaml
@@ -69,7 +69,7 @@ python src/training/train_dkd.py --config configs/large_dkd_s4_t1.yaml
 ### 方式 3: 后台运行（适合长时间训练）
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 
 # 使用 nohup 在后台运行，即使断开 SSH 也继续
 nohup bash scripts/train_large_t1_all.sh > logs/nohup_large_t1.log 2>&1 &
@@ -88,7 +88,7 @@ tail -f logs/nohup_large_t1.log
 tmux new -s large_t1_training
 
 # 在 tmux 中运行训练
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 bash scripts/train_large_t1_all.sh
 
 # 断开 tmux（训练继续）: Ctrl+B 然后按 D
@@ -238,7 +238,7 @@ grep -i "error\|traceback" logs/large_kd_s2_t1_*.log
 运行解析脚本（之前创建的）来汇总所有实验结果：
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 python - <<'PY'
 # (使用之前的解析脚本)
 # 会自动生成:

@@ -38,9 +38,9 @@ logs/
 wandb/
 runs/
 
-# Data
-data/
-datasets/
+# Local datasets (root only; do not ignore the src/data Python package)
+/data/
+/datasets/
 *.wav
 *.mp3
 *.flac
@@ -62,4 +62,3 @@ Thumbs.db
 
 # HuggingFace cache
 .cache/
-

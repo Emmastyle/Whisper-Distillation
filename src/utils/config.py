@@ -14,10 +14,9 @@ class DataConfig:
     max_duration: float = 10.0  # seconds
     batch_size: int = 8
     num_workers: int = 4
+    pin_memory: bool = True
     sample_rate: int = 16000
-    train_ratio: float = 0.9
-    val_ratio: float = 0.05
-    test_ratio: float = 0.05
+    validation_size: int = 100
 
 
 @dataclass
@@ -75,8 +74,8 @@ class Config:
 
 def load_config(config_path: str) -> Config:
     """Load configuration from YAML file"""
-    with open(config_path, 'r') as f:
-        config_dict = yaml.safe_load(f)
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config_dict = yaml.safe_load(f) or {}
     
     data_config = DataConfig(**config_dict.get('data', {}))
     model_config = ModelConfig(**config_dict.get('model', {}))
@@ -97,4 +96,3 @@ def load_config(config_path: str) -> Config:
         kd=kd_config,
         dkd=dkd_config
     )
-

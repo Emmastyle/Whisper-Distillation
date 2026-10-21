@@ -1,16 +1,15 @@
 #!/bin/bash
 # Serial training script for DKD S2 experiments with gamma=0.9
-# Runs large and small teacher experiments sequentially on GPU 0
+# Runs large and small teacher experiments sequentially on selected device
 
 set -e  # Exit on error
 
 # Set CUDA device
-export CUDA_VISIBLE_DEVICES=0
-echo "使用 GPU: $CUDA_VISIBLE_DEVICES"
+echo "使用 Device: ${CUDA_VISIBLE_DEVICES:-auto}"
 echo ""
 
 # Set PYTHONPATH to project root
-PROJECT_ROOT="/home/zz359/workspace-whisper"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
 
 cd "${PROJECT_ROOT}"
@@ -26,7 +25,7 @@ BATCH_LOG="${LOG_DIR}/batch_dkd_s2_g09_${BATCH_TIMESTAMP}.log"
 echo "========================================" | tee -a "${BATCH_LOG}"
 echo "Starting DKD S2 Gamma=0.9 Training" | tee -a "${BATCH_LOG}"
 echo "Timestamp: ${BATCH_TIMESTAMP}" | tee -a "${BATCH_LOG}"
-echo "GPU: ${CUDA_VISIBLE_DEVICES}" | tee -a "${BATCH_LOG}"
+echo "Device: ${CUDA_VISIBLE_DEVICES:-auto}" | tee -a "${BATCH_LOG}"
 echo "========================================" | tee -a "${BATCH_LOG}"
 echo "" | tee -a "${BATCH_LOG}"
 

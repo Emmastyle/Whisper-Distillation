@@ -101,7 +101,7 @@ echo "  2️⃣  批量训练 (所有 6 个配置):"
 echo "     bash scripts/train_dkd_all_configs.sh"
 echo ""
 echo "  3️⃣  单独训练 (快速测试):"
-echo "     python -m src.training.train_dkd --config configs/small_dkd_s2_t2_a08.yaml"
+echo "     python -m src.training.train_dkd --config configs/small_dkd_s2_t2_a20.yaml"
 echo ""
 echo "  4️⃣  监控训练:"
 echo "     tail -f outputs/small_dkd_s2_t2/train.log"
@@ -118,7 +118,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # 检查配置文件
-config_count=$(ls -1 configs/small_dkd_s*_t*_a08.yaml 2>/dev/null | wc -l)
+config_count=$(ls -1 configs/small_dkd_s*_t*_a20.yaml 2>/dev/null | wc -l)
 echo "  配置文件: $config_count / 6"
 if [ $config_count -eq 6 ]; then
     echo "    ✅ 所有配置文件已就绪"
@@ -196,4 +196,3 @@ echo "╔═══════════════════════�
 echo "║  准备就绪！运行 'bash scripts/train_dkd_all_configs.sh' 开始  ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
-

@@ -15,7 +15,7 @@
 ### Step 1: 验证 Phase 2 设置
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate whisper
 python test_phase2_setup.py

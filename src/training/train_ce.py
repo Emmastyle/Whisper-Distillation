@@ -10,12 +10,12 @@ from torch.optim import AdamW
 from tqdm import tqdm
 from pathlib import Path
 
-from src.data import WhisperASRDataset, whisper_collate_fn
+from src.data import WhisperASRDataset, split_dataset, whisper_collate_fn
 from src.models import TeacherWhisper, StudentASRModel
 from src.utils.config import load_config
 from src.utils.logger import setup_logger
 from src.utils.metrics import calculate_wer, calculate_cer
-from transformers import WhisperTokenizer, get_linear_schedule_with_warmup
+from transformers import WhisperFeatureExtractor, WhisperTokenizer, get_linear_schedule_with_warmup
 
 
 def set_seed(seed: int):
@@ -25,6 +25,16 @@ def set_seed(seed: int):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def resolve_device(requested: str) -> torch.device:
+    """Resolve an explicit device or select CUDA automatically when available."""
+    if requested == "auto":
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(requested)
+    if device.type == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError(f"CUDA device requested ({requested}), but CUDA is unavailable.")
+    return device
 
 
 def prepare_decoder_input_ids(labels: torch.Tensor, bos_token_id: int):
@@ -139,11 +149,12 @@ def train(args):
     logger.info(f"Random seed: {config.training.seed}")
     
     # Device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = resolve_device(args.device)
     logger.info(f"Using device: {device}")
     
     # Load tokenizer
     tokenizer = WhisperTokenizer.from_pretrained(config.model.teacher_model)
+    feature_extractor = WhisperFeatureExtractor.from_pretrained(config.model.teacher_model)
     
     # Create datasets
     logger.info("Loading training dataset...")
@@ -151,18 +162,19 @@ def train(args):
         dataset_name=config.data.dataset_name,
         dataset_config=config.data.dataset_config,
         split=config.data.split,
+        feature_extractor=feature_extractor,
+        tokenizer=tokenizer,
         max_duration=config.data.max_duration,
         num_samples=config.data.num_samples,
         sample_rate=config.data.sample_rate,
     )
     
-    # Create validation split (use last 10% of training data)
-    val_size = min(100, len(train_dataset) // 10)
-    train_size = len(train_dataset) - val_size
-    train_dataset, val_dataset = torch.utils.data.random_split(
-        train_dataset, [train_size, val_size]
+    train_dataset, val_dataset = split_dataset(
+        train_dataset,
+        config.training.seed,
+        config.data.validation_size,
     )
-    
+
     logger.info(f"Train size: {len(train_dataset)}, Val size: {len(val_dataset)}")
     
     # Create dataloaders
@@ -172,7 +184,7 @@ def train(args):
         shuffle=True,
         num_workers=config.data.num_workers,
         collate_fn=whisper_collate_fn,
-        pin_memory=True,
+        pin_memory=config.data.pin_memory and device.type == "cuda",
     )
     
     val_loader = DataLoader(
@@ -181,7 +193,7 @@ def train(args):
         shuffle=False,
         num_workers=config.data.num_workers,
         collate_fn=whisper_collate_fn,
-        pin_memory=True,
+        pin_memory=config.data.pin_memory and device.type == "cuda",
     )
     
     # Create models
@@ -205,6 +217,10 @@ def train(args):
         lr=config.training.learning_rate,
         weight_decay=config.training.weight_decay,
     )
+
+    use_fp16 = config.training.fp16 and device.type == "cuda"
+    scaler = torch.cuda.amp.GradScaler(enabled=use_fp16)
+    logger.info(f"Mixed precision training: {use_fp16}")
     
     # Scheduler
     total_steps = len(train_loader) * config.training.epochs
@@ -233,15 +249,17 @@ def train(args):
             decoder_input_ids = prepare_decoder_input_ids(labels, tokenizer.bos_token_id)
             
             # Forward pass
-            loss, logits = model(
-                input_features=input_features,
-                decoder_input_ids=decoder_input_ids,
-                labels=labels,
-            )
+            with torch.cuda.amp.autocast(enabled=use_fp16):
+                loss, logits = model(
+                    input_features=input_features,
+                    decoder_input_ids=decoder_input_ids,
+                    labels=labels,
+                )
             
             # Backward pass
             optimizer.zero_grad()
-            loss.backward()
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
             
             # Gradient clipping
             torch.nn.utils.clip_grad_norm_(
@@ -249,7 +267,8 @@ def train(args):
                 config.training.gradient_clip
             )
             
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
             scheduler.step()
             
             # Logging
@@ -335,7 +354,11 @@ def train(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train CE baseline")
     parser.add_argument("--config", type=str, required=True, help="Path to config file")
+    parser.add_argument(
+        "--device",
+        default="auto",
+        help="Torch device (auto, cpu, cuda, or cuda:N; default: auto)",
+    )
     args = parser.parse_args()
     
     train(args)
-

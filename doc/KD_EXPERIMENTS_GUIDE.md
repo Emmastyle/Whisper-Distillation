@@ -43,7 +43,7 @@ workspace-whisper/
 ### 1. 验证配置
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 python scripts/verify_configs.py
 ```
 
@@ -303,7 +303,7 @@ if return_teacher_logits:
 **解决方案**:
 ```bash
 # 确保在项目根目录运行
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 
 # 检查配置文件
 ls -l configs/small_kd_s*_t*_a01.yaml
@@ -393,7 +393,7 @@ python scripts/verify_configs.py
 运行以下命令开始实验：
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 python scripts/verify_configs.py  # 验证配置
 bash scripts/train_kd_all_configs.sh  # 开始训练
 ```

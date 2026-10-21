@@ -65,7 +65,7 @@ echo "bash scripts/train_kd_t1_s3.sh  # T=1.0, S3"
 echo "bash scripts/train_kd_t2_s3.sh  # T=2.0, S3"
 echo ""
 echo "# 直接调用 Python"
-echo "python -m src.training.train_kd --config configs/small_kd_s2_t1.yaml"
+echo "python -m src.training.train_kd --config configs/small_kd_s2_t1_a01.yaml"
 echo ""
 
 echo "========================================"
@@ -102,4 +102,3 @@ echo "📖 详细说明："
 echo "========================================"
 echo "查看 KD_TEMPERATURE_EXPERIMENTS.md 了解实验设计和预期结果"
 echo ""
-

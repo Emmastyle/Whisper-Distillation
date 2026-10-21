@@ -1,16 +1,15 @@
 #!/bin/bash
-# Run DKD a0.5/b2/g0.6 configs on CUDA:4 (S2/S3/S4 T1)
+# Run DKD a0.5/b2/g0.6 configs on selected device (S2/S3/S4 T1)
 
 set -e
 
-export CUDA_VISIBLE_DEVICES=4
 
-PROJECT_ROOT="/home/zz359/workspace-whisper"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
 cd "${PROJECT_ROOT}"
 
 echo "====================================="
-echo "DKD a0.5 b2.0 g0.6 (CUDA:4)"
+echo "DKD a0.5 b2.0 g0.6 (selected device)"
 echo "====================================="
 echo ""
 

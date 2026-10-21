@@ -93,7 +93,8 @@ def analyze_models(outputs_dir):
 
 
 def main():
-    outputs_dir = "/home/zz359/workspace-whisper/outputs"
+    project_root = Path(__file__).resolve().parents[1]
+    outputs_dir = project_root / "outputs"
     
     print("=" * 80)
     print("开始分析模型...")
@@ -124,14 +125,14 @@ def main():
     print(df.to_string(index=False))
     
     # 保存到 CSV
-    csv_path = "/home/zz359/workspace-whisper/analysis/model_sizes.csv"
+    csv_path = project_root / "analysis" / "model_sizes.csv"
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     df.to_csv(csv_path, index=False)
     print()
     print(f"✓ 结果已保存到: {csv_path}")
     
     # 保存到 Markdown
-    md_path = "/home/zz359/workspace-whisper/analysis/model_sizes.md"
+    md_path = project_root / "analysis" / "model_sizes.md"
     with open(md_path, 'w', encoding='utf-8') as f:
         f.write("# 模型参数统计\n\n")
         f.write(df.to_markdown(index=False))
@@ -165,4 +166,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

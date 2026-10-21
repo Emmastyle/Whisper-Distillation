@@ -94,7 +94,7 @@ bash scripts/train_dkd_all_configs.sh
 ### 步骤 1: 验证配置
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 python scripts/verify_dkd_configs.py
 ```
 
@@ -338,7 +338,7 @@ Loss = 0.1 * CE + 0.9 * (0.8 * TCKD + 1.2 * NCKD)
 **现在你可以直接开始训练！**
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 python scripts/verify_dkd_configs.py  # 验证
 bash scripts/train_dkd_all_configs.sh  # 训练
 ```

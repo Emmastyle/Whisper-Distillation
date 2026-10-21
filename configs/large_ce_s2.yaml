@@ -17,9 +17,6 @@ data:
   batch_size: 16
   num_workers: 8
   sample_rate: 16000
-  train_ratio: 0.9
-  val_ratio: 0.05
-  test_ratio: 0.05
 
 training:
   epochs: 15

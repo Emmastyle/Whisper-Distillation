@@ -102,7 +102,7 @@ workspace-whisper/
 ### 1. 验证配置
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 python scripts/verify_dkd_configs.py
 ```
 
@@ -508,7 +508,7 @@ done
 运行以下命令开始实验：
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 python scripts/verify_dkd_configs.py  # 验证配置
 bash scripts/train_dkd_all_configs.sh  # 开始训练
 ```

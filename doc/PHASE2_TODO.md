@@ -28,7 +28,7 @@ cat outputs/data_100h_statistics.txt
 
 **运行命令**:
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate whisper
 python scripts/test_teacher_small.py --num_samples 100

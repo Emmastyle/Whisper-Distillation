@@ -5,11 +5,8 @@
 
 set -e  # Exit on error
 
-# Set PYTHONPATH to project root
-export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-
 # Configuration
-PROJECT_ROOT="/home/zz359/workspace-whisper"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG_DIR="${PROJECT_ROOT}/logs"
 PYTHON="python"
 
@@ -29,26 +26,26 @@ echo "" | tee -a "${BATCH_LOG}"
 cd "${PROJECT_ROOT}"
 
 # Set PYTHONPATH
-export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
+export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH:-}"
 
 # Array of configurations
 CONFIGS=(
-    "configs/large_kd_s2_t1.yaml"
-    "configs/large_kd_s3_t1.yaml"
-    "configs/large_kd_s4_t1.yaml"
-    "configs/large_dkd_s2_t1.yaml"
-    "configs/large_dkd_s3_t1.yaml"
-    "configs/large_dkd_s4_t1.yaml"
+    "configs/large_kd_s2_t1_a05.yaml"
+    "configs/large_kd_s3_t1_a05.yaml"
+    "configs/large_kd_s4_t1_a05.yaml"
+    "configs/large_dkd_s2_t1_g06.yaml"
+    "configs/large_dkd_s3_t1_g06.yaml"
+    "configs/large_dkd_s4_t1_g06.yaml"
 )
 
 # Training scripts mapping
 declare -A TRAIN_SCRIPTS
-TRAIN_SCRIPTS["large_kd_s2_t1"]="src/training/train_kd.py"
-TRAIN_SCRIPTS["large_kd_s3_t1"]="src/training/train_kd.py"
-TRAIN_SCRIPTS["large_kd_s4_t1"]="src/training/train_kd.py"
-TRAIN_SCRIPTS["large_dkd_s2_t1"]="src/training/train_dkd.py"
-TRAIN_SCRIPTS["large_dkd_s3_t1"]="src/training/train_dkd.py"
-TRAIN_SCRIPTS["large_dkd_s4_t1"]="src/training/train_dkd.py"
+TRAIN_SCRIPTS["large_kd_s2_t1_a05"]="src/training/train_kd.py"
+TRAIN_SCRIPTS["large_kd_s3_t1_a05"]="src/training/train_kd.py"
+TRAIN_SCRIPTS["large_kd_s4_t1_a05"]="src/training/train_kd.py"
+TRAIN_SCRIPTS["large_dkd_s2_t1_g06"]="src/training/train_dkd.py"
+TRAIN_SCRIPTS["large_dkd_s3_t1_g06"]="src/training/train_dkd.py"
+TRAIN_SCRIPTS["large_dkd_s4_t1_g06"]="src/training/train_dkd.py"
 
 # Function to extract config name from path
 get_config_name() {
@@ -115,4 +112,3 @@ echo "========================================" | tee -a "${BATCH_LOG}"
 if [ ${FAILED} -gt 0 ]; then
     exit 1
 fi
-

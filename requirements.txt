@@ -1,11 +1,15 @@
 torch
 torchaudio
+numpy
 transformers
 datasets
 pyyaml
 jiwer
 librosa
 soundfile
+tqdm
 pandas
 matplotlib
 seaborn
+tabulate
+fvcore

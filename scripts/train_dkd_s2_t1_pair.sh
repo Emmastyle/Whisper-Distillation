@@ -5,10 +5,9 @@
 set -e  # Exit on error
 
 # Set CUDA device
-export CUDA_VISIBLE_DEVICES=2
 
 # Set PYTHONPATH to project root
-PROJECT_ROOT="/home/zz359/workspace-whisper"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
 cd "${PROJECT_ROOT}"
 

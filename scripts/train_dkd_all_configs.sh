@@ -76,8 +76,7 @@ echo "  Gamma: 0.1 (CE 权重, DKD 权重 = 0.9)"
 echo ""
 
 # 设置 GPU 设备
-export CUDA_VISIBLE_DEVICES=3
-print_info "使用 GPU: $CUDA_VISIBLE_DEVICES"
+print_info "使用 Device: ${CUDA_VISIBLE_DEVICES:-auto}"
 echo ""
 
 # 定义所有配置

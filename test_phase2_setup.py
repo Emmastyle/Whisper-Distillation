@@ -23,6 +23,9 @@ def test_config_files():
         "configs/small_kd_s2.yaml",
         "configs/small_kd_s3.yaml",
         "configs/small_kd_s4.yaml",
+        "configs/small_kd_s2_t4_a05.yaml",
+        "configs/small_kd_s3_t4_a05.yaml",
+        "configs/small_kd_s4_t4_a05.yaml",
     ]
     
     all_pass = True
@@ -91,7 +94,7 @@ def test_directory_structure():
         "scripts",
         "src",
         "doc",
-        "outputs",
+        "analysis",
     ]
     
     all_pass = True
@@ -164,6 +167,13 @@ def test_imports():
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     
     try:
+        from src.data import WhisperASRDataset, split_dataset, whisper_collate_fn
+        print(f"  ✓ src.data")
+    except Exception as e:
+        print(f"  ✗ src.data 导入失败: {str(e)}")
+        all_pass = False
+
+    try:
         from src.models.teacher import TeacherWhisperModel
         print(f"  ✓ src.models.teacher")
     except Exception as e:
@@ -227,4 +237,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

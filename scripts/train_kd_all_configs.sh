@@ -14,17 +14,14 @@ echo "Temperature: 1.0, 2.0"
 echo ""
 
 # 设置 GPU 设备
-export CUDA_VISIBLE_DEVICES=4
-echo "使用 GPU: $CUDA_VISIBLE_DEVICES"
+echo "使用 Device: ${CUDA_VISIBLE_DEVICES:-auto}"
 echo ""
 
-# 激活 conda 环境
+# Report the active environment; dependency management is left to the caller.
 if [ -n "$CONDA_DEFAULT_ENV" ]; then
     echo "✓ 当前 conda 环境: $CONDA_DEFAULT_ENV"
 else
-    echo "激活 whisper 环境..."
-    source ~/miniconda3/etc/profile.d/conda.sh
-    conda activate whisper
+    echo "未检测到 conda 环境，将使用: $(command -v python)"
 fi
 
 # 获取项目根目录

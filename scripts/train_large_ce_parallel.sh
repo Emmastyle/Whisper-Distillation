@@ -1,66 +1,51 @@
-#!/bin/bash
-# Train Large CE models on GPU 0/1/2 (parallel training)
-# 3 large models with CE-only baseline
+#!/usr/bin/env bash
+# Run the three large-teacher CE configs concurrently on caller-selected GPUs.
 
-set -e  # Exit on error
+set -euo pipefail
 
-# Set PYTHONPATH to project root
-PROJECT_ROOT="/home/zz359/workspace-whisper"
-export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
-cd "${PROJECT_ROOT}"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
+mkdir -p logs
 
-echo "============================================="
-echo "Training Large CE Models (Parallel on GPU 0/1/2)"
-echo "3 Large Models (CE-only baseline)"
-echo "============================================="
-echo ""
+GPU_LIST="${GPU_IDS:-${1:-}}"
+if [[ -z "$GPU_LIST" ]]; then
+    echo "Usage: GPU_IDS=0,1,2 bash scripts/train_large_ce_parallel.sh" >&2
+    echo "Provide exactly three CUDA device indexes; no device is selected by default." >&2
+    exit 2
+fi
 
-# Train all 3 models in parallel on different GPUs
-echo "Starting all 3 training jobs in parallel..."
-echo "Started at: $(date)"
-echo ""
+IFS=',' read -r -a DEVICES <<< "$GPU_LIST"
+if [[ ${#DEVICES[@]} -ne 3 ]]; then
+    echo "Expected exactly three comma-separated GPU indexes, got: $GPU_LIST" >&2
+    exit 2
+fi
 
-# GPU 0: large_ce_s2
-CUDA_VISIBLE_DEVICES=0 python -m src.training.train_ce --config configs/large_ce_s2.yaml > logs/large_ce_s2.log 2>&1 &
-PID1=$!
-echo "[GPU 0] Training large_ce_s2 (PID: $PID1)"
+CONFIGS=(
+    "configs/large_ce_s2.yaml"
+    "configs/large_ce_s3.yaml"
+    "configs/large_ce_s4.yaml"
+)
+NAMES=("large_ce_s2" "large_ce_s3" "large_ce_s4")
+PIDS=()
 
-# GPU 1: large_ce_s3
-CUDA_VISIBLE_DEVICES=1 python -m src.training.train_ce --config configs/large_ce_s3.yaml > logs/large_ce_s3.log 2>&1 &
-PID2=$!
-echo "[GPU 1] Training large_ce_s3 (PID: $PID2)"
+for index in "${!CONFIGS[@]}"; do
+    device="cuda:${DEVICES[$index]}"
+    echo "Starting ${NAMES[$index]} on $device"
+    python -m src.training.train_ce \
+        --config "${CONFIGS[$index]}" \
+        --device "$device" \
+        > "logs/${NAMES[$index]}.log" 2>&1 &
+    PIDS+=("$!")
+done
 
-# GPU 2: large_ce_s4
-CUDA_VISIBLE_DEVICES=2 python -m src.training.train_ce --config configs/large_ce_s4.yaml > logs/large_ce_s4.log 2>&1 &
-PID3=$!
-echo "[GPU 2] Training large_ce_s4 (PID: $PID3)"
+failed=0
+for index in "${!PIDS[@]}"; do
+    if wait "${PIDS[$index]}"; then
+        echo "Completed ${NAMES[$index]}"
+    else
+        echo "Failed ${NAMES[$index]}; see logs/${NAMES[$index]}.log" >&2
+        failed=1
+    fi
+done
 
-echo ""
-echo "All training jobs started! Waiting for completion..."
-echo ""
-
-# Wait for all background jobs to finish
-wait $PID1
-echo "[GPU 0] large_ce_s2 completed at $(date)"
-
-wait $PID2
-echo "[GPU 1] large_ce_s3 completed at $(date)"
-
-wait $PID3
-echo "[GPU 2] large_ce_s4 completed at $(date)"
-
-echo ""
-echo "============================================="
-echo "All Large CE training jobs completed!"
-echo "Finished at: $(date)"
-echo "============================================="
-echo ""
-echo "Check logs in logs/ directory:"
-echo "  - logs/large_ce_s2.log"
-echo "  - logs/large_ce_s3.log"
-echo "  - logs/large_ce_s4.log"
-
-
-
-
-
+exit "$failed"

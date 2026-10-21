@@ -1,19 +1,18 @@
 #!/bin/bash
-# Train T2 G09 models - Batch 2 (GPU 4)
+# Train T2 G09 models - Batch 2 (selected device)
 # 3 small models with temperature=2.0, gamma=0.9 (串行训练)
 
 set -e  # Exit on error
 
 # Set CUDA device
-export CUDA_VISIBLE_DEVICES=4
 
 # Set PYTHONPATH to project root
-PROJECT_ROOT="/home/zz359/workspace-whisper"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH}"
 cd "${PROJECT_ROOT}"
 
 echo "============================================="
-echo "Training T2 G09 Models - Batch 2 (GPU 4)"
+echo "Training T2 G09 Models - Batch 2 (selected device)"
 echo "3 Small Models (Temperature=2.0, Gamma=0.9)"
 echo "============================================="
 echo ""

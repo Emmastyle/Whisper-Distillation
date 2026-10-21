@@ -6,12 +6,13 @@
 set -e  # Exit on error
 
 # Set CUDA device
-export CUDA_VISIBLE_DEVICES=2
-echo "使用 GPU: $CUDA_VISIBLE_DEVICES"
+echo "使用 Device: ${CUDA_VISIBLE_DEVICES:-auto}"
 echo ""
 
-# Set PYTHONPATH to project root
-export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+# Resolve the repository root from this script, not the caller's directory.
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
+export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH:-}"
 
 # Colors for output
 GREEN='\033[0;32m'

@@ -5,7 +5,7 @@
 - 总样本数
 - 时长分布
 - 文本长度分布
-- 训练/验证/测试划分统计
+- 历史训练/验证划分统计
 """
 
 import sys
@@ -14,6 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import yaml
 import numpy as np
+import torch
 from datasets import load_dataset
 from tqdm import tqdm
 import logging
@@ -89,27 +90,25 @@ def analyze_dataset(config_path: str):
     logger.info(f"  最小值: {text_lengths.min()}")
     logger.info(f"  最大值: {text_lengths.max()}")
     
-    # 数据划分统计
-    train_ratio = data_config['train_ratio']
-    val_ratio = data_config['val_ratio']
-    test_ratio = data_config['test_ratio']
-    
-    train_size = int(valid_samples * train_ratio)
-    val_size = int(valid_samples * val_ratio)
-    test_size = valid_samples - train_size - val_size
+    # 与训练入口一致：验证集最多 100 条，其余作为训练集
+    validation_size = data_config.get('validation_size', 100)
+    val_size = max(1, min(validation_size, valid_samples // 10))
+    train_size = valid_samples - val_size
     
     logger.info(f"\n【数据划分】")
-    logger.info(f"  训练集: {train_size} 样本 ({train_ratio*100:.0f}%)")
-    logger.info(f"  验证集: {val_size} 样本 ({val_ratio*100:.0f}%)")
-    logger.info(f"  测试集: {test_size} 样本 ({test_ratio*100:.0f}%)")
+    logger.info(f"  训练集: {train_size} 样本")
+    logger.info(f"  验证集: {val_size} 样本")
+    logger.info("  测试集: 未创建（历史实验协议）")
     
-    train_hours = durations[:train_size].sum() / 3600
-    val_hours = durations[train_size:train_size+val_size].sum() / 3600
-    test_hours = durations[train_size+val_size:].sum() / 3600
+    indices = torch.randperm(
+        valid_samples,
+        generator=torch.Generator().manual_seed(42),
+    ).numpy()
+    train_hours = durations[indices[:train_size]].sum() / 3600
+    val_hours = durations[indices[train_size:]].sum() / 3600
     
     logger.info(f"\n【训练集时长】: {train_hours:.2f} 小时")
     logger.info(f"【验证集时长】: {val_hours:.2f} 小时")
-    logger.info(f"【测试集时长】: {test_hours:.2f} 小时")
     logger.info("="*60 + "\n")
     
     # 保存报告到文件
@@ -140,12 +139,11 @@ def analyze_dataset(config_path: str):
         f.write(f"  最小值: {text_lengths.min()}\n")
         f.write(f"  最大值: {text_lengths.max()}\n\n")
         f.write(f"【数据划分】\n")
-        f.write(f"  训练集: {train_size} 样本 ({train_ratio*100:.0f}%)\n")
-        f.write(f"  验证集: {val_size} 样本 ({val_ratio*100:.0f}%)\n")
-        f.write(f"  测试集: {test_size} 样本 ({test_ratio*100:.0f}%)\n\n")
+        f.write(f"  训练集: {train_size} 样本\n")
+        f.write(f"  验证集: {val_size} 样本\n")
+        f.write("  测试集: 未创建（历史实验协议）\n\n")
         f.write(f"【训练集时长】: {train_hours:.2f} 小时\n")
         f.write(f"【验证集时长】: {val_hours:.2f} 小时\n")
-        f.write(f"【测试集时长】: {test_hours:.2f} 小时\n")
         f.write("="*60 + "\n")
     
     logger.info(f"统计报告已保存至: {output_file}")
@@ -169,4 +167,3 @@ if __name__ == "__main__":
     
     stats = analyze_dataset(config_path)
     logger.info(f"\n✓ 数据分析完成！")
-

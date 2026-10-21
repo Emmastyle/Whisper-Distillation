@@ -11,7 +11,7 @@
 ## 步骤 1：安装依赖
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 pip install -r requirements.txt
 ```
 

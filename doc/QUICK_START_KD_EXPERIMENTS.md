@@ -49,7 +49,7 @@ scripts/
 ### 方式 1: 批量运行所有实验（推荐用于完整实验）
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 bash scripts/train_kd_temperature_sweep.sh
 ```
 
@@ -58,7 +58,7 @@ bash scripts/train_kd_temperature_sweep.sh
 ### 方式 2: 单独运行（推荐用于快速测试）
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 
 # 先测试 S2 模型（最快）
 bash scripts/train_kd_t1_s2.sh  # T=1.0, 约 2 小时
@@ -76,7 +76,7 @@ bash scripts/train_kd_t2_s4.sh  # T=2.0, 约 3 小时
 ### 方式 3: 直接调用 Python
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 
 # 示例：运行 S2, T=2.0
 python -m src.training.train_kd --config configs/small_kd_s2_t2.yaml
@@ -212,7 +212,7 @@ bash scripts/train_kd_temperature_sweep.sh  # 运行所有配置
 
 ## ⚠️ 注意事项
 
-1. **GPU 使用**: 默认使用 GPU 3 (`CUDA_VISIBLE_DEVICES=3`)
+1. **GPU 使用**: 默认自动选择可用设备；也可通过 `--device cuda:N` 显式指定
    - 如需修改，编辑脚本中的 GPU 设置
 
 2. **磁盘空间**: 每个模型约占用 500MB
@@ -229,10 +229,10 @@ bash scripts/train_kd_temperature_sweep.sh  # 运行所有配置
 4. **并行训练**: 如果有多个 GPU
    ```bash
    # Terminal 1 (GPU 0)
-   CUDA_VISIBLE_DEVICES=0 bash scripts/train_kd_t1_s2.sh &
+   python -m src.training.train_kd --config configs/small_kd_s2_t1_a01.yaml --device cuda:N &
    
    # Terminal 2 (GPU 1)
-   CUDA_VISIBLE_DEVICES=1 bash scripts/train_kd_t2_s2.sh &
+   python -m src.training.train_kd --config configs/small_kd_s2_t2_a01.yaml --device cuda:M &
    ```
 
 ## 📞 问题排查
@@ -290,7 +290,7 @@ python -m src.training.train_kd --config configs/small_kd_s2_t2_lr01.yaml
 运行以下命令开始实验：
 
 ```bash
-cd /home/zz359/workspace-whisper
+cd workspace-whisper
 bash scripts/train_kd_temperature_sweep.sh
 ```
 
@@ -299,4 +299,3 @@ bash scripts/train_kd_temperature_sweep.sh
 ```bash
 bash scripts/train_kd_t2_s2.sh
 ```
-

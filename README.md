@@ -2,6 +2,15 @@
 
 A compact research implementation for compressing Whisper by keeping its pretrained encoder frozen and training smaller 2/3/4-layer decoders with cross-entropy (CE), knowledge distillation (KD), or decoupled knowledge distillation (DKD).
 
+## Team
+
+Whisper-Distillation was developed collaboratively by:
+
+- [Ziyue Zhang](https://github.com/Emmastyle)
+- [Yihang Zou](https://github.com/Bbbxdjc)
+
+This repository contains the consolidated version of the team's work.
+
 ## Project status
 
 
